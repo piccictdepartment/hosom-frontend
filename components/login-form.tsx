@@ -6,149 +6,72 @@ import { useRouter } from 'next/navigation';
 import { roles, portalHref, type RoleSlug } from '@/lib/demo-data';
 import './login-form.css';
 
+/** Temporary, credential-free access for reviewing the frontend workspaces. */
 export function LoginForm() {
   const router = useRouter();
-  const [role, setRole] = useState<string>('');
-  const [id, setId] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
+  const [role, setRole] = useState<RoleSlug | ''>('');
   const [notice, setNotice] = useState<string | null>(null);
 
-  function handleSubmit(e: FormEvent) {
-    e.preventDefault();
+  function enterWorkspace(selectedRole: RoleSlug) {
+    setNotice(`Opening the ${roles[selectedRole].label} workspace…`);
+    router.push(portalHref(selectedRole));
+  }
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     if (!role) {
-      setNotice('Please select a role to proceed.');
+      setNotice('Please select a workspace to continue.');
       return;
     }
-    // As functionalities will be added later, route to the preview of selected role workspace
-    setNotice(`Signing in as ${roles[role as RoleSlug]?.label || role}... Redirecting to workspace.`);
-    setTimeout(() => {
-      router.push(portalHref(role as RoleSlug));
-    }, 600);
+    enterWorkspace(role);
   }
 
   return (
     <div className="login-form-container">
       <form onSubmit={handleSubmit} className="auth-form">
-        {notice && (
-          <div className="login-alert" role="status">
-            {notice}
-          </div>
-        )}
+        <div className="login-demo-banner" role="status">
+          <span className="login-demo-banner-icon" aria-hidden="true">✓</span>
+          <span>
+            <strong>Demo access is enabled</strong>
+            <small>Choose a workspace below. No username, ID or password is required.</small>
+          </span>
+        </div>
+
+        {notice && <div className="login-alert" role="status">{notice}</div>}
 
         <div className="login-field">
-          <label htmlFor="login-role">
-            <span>Role (Select option of the role)</span>
-            <span className="required-star">*</span>
-          </label>
+          <label htmlFor="login-role">Choose your workspace</label>
           <div className="select-wrap">
             <select
               id="login-role"
               name="role"
               value={role}
-              onChange={(e) => {
-                setRole(e.target.value);
+              onChange={(event) => {
+                setRole(event.target.value as RoleSlug | '');
                 setNotice(null);
               }}
               required
             >
-              <option value="" disabled>
-                -- Select option of the role --
-              </option>
+              <option value="">Select a HOSOM workspace</option>
               {(Object.keys(roles) as RoleSlug[]).map((key) => (
                 <option key={key} value={key}>
-                  {roles[key].label} ({roles[key].subtitle})
+                  {roles[key].label} — {roles[key].subtitle}
                 </option>
               ))}
             </select>
             <span className="select-arrow" aria-hidden="true">▾</span>
           </div>
-          <small className="field-hint">Select the designated role to access your portal</small>
-        </div>
-
-        <div className="login-field">
-          <label htmlFor="login-id">
-            <span>ID</span>
-            <span className="required-star">*</span>
-          </label>
-          <input
-            id="login-id"
-            name="id"
-            type="text"
-            value={id}
-            onChange={(e) => setId(e.target.value)}
-            placeholder="e.g. HOSOM/2026/014 or Staff ID"
-            autoComplete="username"
-            required
-          />
-          <small className="field-hint">Enter your student ID, lecturer ID, or staff identity number</small>
-        </div>
-
-        <div className="login-field">
-          <div className="field-label-row">
-            <label htmlFor="login-password">
-              <span>Password</span>
-              <span className="required-star">*</span>
-            </label>
-            <a
-              href="#forgot-password"
-              onClick={(e) => {
-                e.preventDefault();
-                setNotice('Password reset flow will be enabled once backend authentication is connected.');
-              }}
-              className="forgot-link"
-            >
-              Forgot password?
-            </a>
-          </div>
-          <div className="password-input-wrap">
-            <input
-              id="login-password"
-              name="password"
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              autoComplete="current-password"
-              required
-            />
-            <button
-              type="button"
-              className="toggle-password-btn"
-              onClick={() => setShowPassword(!showPassword)}
-              aria-label={showPassword ? 'Hide password' : 'Show password'}
-            >
-              {showPassword ? 'Hide' : 'Show'}
-            </button>
-          </div>
-          <small className="field-hint">Your confidential portal access credentials</small>
-        </div>
-
-        <div className="login-aux-row">
-          <label className="checkbox-label">
-            <input
-              type="checkbox"
-              checked={rememberMe}
-              onChange={(e) => setRememberMe(e.target.checked)}
-            />
-            <span>Remember my ID</span>
-          </label>
+          <small className="field-hint">You can switch to another workspace at any time.</small>
         </div>
 
         <button type="submit" className="login-button">
-          Sign In
+          Enter selected workspace <span aria-hidden="true">→</span>
         </button>
-
-        <p className="login-status-note">
-          <span className="status-badge">Preview Mode</span>
-          Backend authentication functionality will be added later. Submitting will direct you to the selected role workspace.
-        </p>
       </form>
 
       <div className="role-preview-section">
         <div className="section-divider">
-          <span>Or explore sample workspaces directly</span>
+          <span>Or enter a workspace directly</span>
         </div>
         <div className="role-preview-grid">
           {(Object.keys(roles) as RoleSlug[]).map((key) => (
@@ -157,11 +80,16 @@ export function LoginForm() {
                 <b>{roles[key].label}</b>
                 <small>{roles[key].subtitle}</small>
               </div>
-              <span className="preview-arrow">→</span>
+              <span className="preview-arrow" aria-hidden="true">→</span>
             </Link>
           ))}
         </div>
       </div>
+
+      <p className="login-status-note">
+        <span className="status-badge">Preview mode</span>
+        These workspaces use illustrative sample records. This temporary access is for review and testing only; it does not provide real account authentication or protect private records.
+      </p>
     </div>
   );
 }

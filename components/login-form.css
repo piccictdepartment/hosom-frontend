@@ -274,3 +274,53 @@
     max-height: none;
   }
 }
+
+.login-demo-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 15px;
+  border: 1px solid #c7dff5;
+  border-radius: 7px;
+  background: #f0f7ff;
+  color: #173d69;
+}
+
+.login-demo-banner-icon {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  border-radius: 50%;
+  background: #d8eaff;
+  color: #1f64ad;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.login-demo-banner strong,
+.login-demo-banner small {
+  display: block;
+}
+
+.login-demo-banner strong {
+  font-size: 12px;
+}
+
+.login-demo-banner small {
+  margin-top: 4px;
+  color: #617d9e;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.login-button:disabled {
+  cursor: not-allowed;
+  opacity: .55;
+  transform: none;
+}
+
+.login-status-note {
+  margin-bottom: 0;
+}

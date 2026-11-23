@@ -9,7 +9,7 @@ npm ci
 npm run dev
 ```
 
-Open the local URL shown by Next.js. Use **Portal login** to choose one of the ten demo roles.
+Open the local URL shown by Next.js. Use **Portal login** to enter any of the ten demo workspaces without credentials. Choose a role from the selector or open a workspace directly.
 
 ## Interface structure
 
@@ -35,7 +35,7 @@ The cross-role demo processes include:
 - Requisition submission → Head of HOSOM forwarding → Director approval → Finance sample payment initiation.
 - Staff announcements, events and selected communication previews.
 
-These are interface demonstrations. They do not authenticate users, save uploads, deliver messages, transfer funds or enforce server permissions. Those responsibilities belong to the separate backend. Role routes are previews, not access control.
+These are interface demonstrations. Credential-free demo access is intentionally enabled for implementation review. The frontend does not authenticate users, save uploads, deliver messages, transfer funds or enforce server permissions. Do not use this preview with real private records or expose it as a production system. Those responsibilities belong to the separate backend. Role routes are previews, not access control.
 
 ## Backend integration
 
