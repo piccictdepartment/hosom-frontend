@@ -1,0 +1,8 @@
+HELMS demo media
+
+File: learning-player-sample.mp4
+Original filename: flower.mp4
+Source: MDN interactive examples, cc0-videos directory
+URL: https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4
+
+Used solely as a short playback sample. This is not a HOSOM lecture or classroom recording.

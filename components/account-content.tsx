@@ -1,9 +1,13 @@
 'use client';
-import { useState, type FormEvent } from 'react';
+
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useAuth } from '@/components/auth-provider';
+import { ApiClientError, apiRequest, type SessionRecord } from '@/lib/api';
 import { roles, type RoleSlug } from '@/lib/demo-data';
 
 type Organisation = { id: string; name: string; email: string; contact: string; phone: string; address: string };
 type Message = { id: string; subject: string; body: string; recipients: string[]; cc: string; bcc: string; author: string; date: string; attachments: string[] };
+
 const initialOrganisations: Organisation[] = [
   { id: 'ORG-001', name: 'Grace Community Foundation', email: 'partnerships@grace-foundation.example', contact: 'Martha Banda', phone: '+265 888 000 101', address: 'Lilongwe, Malawi' },
   { id: 'ORG-002', name: 'Hope Education Network', email: 'office@hope-education.example', contact: 'David Tembo', phone: '+265 888 000 102', address: 'Blantyre, Malawi' },
@@ -13,23 +17,200 @@ const initialMessages: Message[] = [
   { id: 'EXT-DEMO-002', subject: 'Invitation to our partnership meeting', body: 'We would like to invite Grace Community Foundation to a partnership meeting at HOSOM.', recipients: ['ORG-001'], cc: '', bcc: '', author: 'Secretariat', date: '25 Oct 2026', attachments: ['Partnership meeting agenda.txt'] },
   { id: 'EXT-DEMO-001', subject: 'Exploring academic collaboration', body: 'We would welcome a conversation about shared training opportunities and learning resources.', recipients: ['ORG-002', 'ORG-003'], cc: '', bcc: '', author: 'Director / Chancellor', date: '23 Oct 2026', attachments: [] },
 ];
-function Intro({ eyebrow, title, copy }: { eyebrow: string; title: string; copy: string }) { return <div className="ac-intro"><p className="eyebrow">{eyebrow}</p><h1>{title}</h1><p>{copy}</p></div>; }
-function Details({ rows }: { rows: [string, string][] }) { return <dl className="ac-details">{rows.map(([name, value]) => <div key={name}><dt>{name}</dt><dd>{value || 'Not recorded'}</dd></div>)}</dl>; }
+
+function Intro({ eyebrow, title, copy }: { eyebrow: string; title: string; copy: string }) {
+  return <div className="ac-intro"><p className="eyebrow">{eyebrow}</p><h1>{title}</h1><p>{copy}</p></div>;
+}
+function Details({ rows }: { rows: [string, string][] }) {
+  return <dl className="ac-details">{rows.map(([name, value]) => <div key={name}><dt>{name}</dt><dd>{value || 'Not recorded'}</dd></div>)}</dl>;
+}
+
 export function AccountContent({ role, section }: { role: RoleSlug; section: string }) {
   if (section === 'Account Security') return <AccountSecurity role={role} />;
   if (section === 'Notification Preferences') return <NotificationPreferences />;
   return <Mailer role={role} />;
 }
-function AccountSecurity({ role }: { role: RoleSlug }) {
-  const [minutes, setMinutes] = useState('15');
-  const [applied, setApplied] = useState(false);
-  const [activity, setActivity] = useState<string[]>([]);
-  return <div className="ac-page"><Intro eyebrow="ACCOUNT AND SESSION" title="Account security" copy="Review your identity, preview session preferences and recent activity in this open tab." /><section className="ac-panel"><h2>Account details</h2><Details rows={[
-    ['Account identifier', roles[role].id], ['Name', roles[role].person], ['Portal', roles[role].label],
-    ['Authentication', 'Role preview — backend authentication is not connected'],
-    ['Current sign-in', 'Demo preview'], ['Previous sign-in', 'Not recorded'],
-  ]} /></section><section className="ac-panel"><h2>Inactivity timeout</h2><p className="ac-copy">Choose how an authorised session should time out. This demo records the selection only on this screen and does not enforce a real sign-out.</p><form className="ac-inline-form" onSubmit={e => { e.preventDefault(); setApplied(true); setActivity([`Selected ${minutes}-minute timeout for preview`, ...activity]); }}><label>Timeout in minutes<select value={minutes} onChange={e => { setMinutes(e.target.value); setApplied(false); }}>{['5','10','15','30','60'].map(value => <option key={value}>{value}</option>)}</select></label><button type="submit" className="ac-button">Apply preview preference</button></form>{applied && <p className="ac-success" role="status">{minutes}-minute preference selected for this open view.</p>}</section><section className="ac-note"><strong>Password changes and resets</strong><p>Contact the authorised account administrator for assistance. Password entry, changes and reset delivery require the separate authentication backend. No passwords are collected by this preview.</p></section><section className="ac-panel"><h2>Activity in this view</h2><div className="ac-table-wrap"><table><thead><tr><th>Account</th><th>Action</th></tr></thead><tbody>{activity.length ? activity.map((item, index) => <tr key={index}><td>{roles[role].id}</td><td>{item}</td></tr>) : <tr><td colSpan={2}>No activity recorded in this open view.</td></tr>}</tbody></table></div><p className="ac-small">This list is illustrative and is not an authoritative security audit log.</p></section></div>;
+
+export function AccountSecurity({ role }: { role: RoleSlug }) {
+  const { user, logout } = useAuth();
+  const [sessions, setSessions] = useState<SessionRecord[]>([]);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const loadSessions = useCallback(async () => {
+    if (!user) return;
+    try {
+      const { data } = await apiRequest<SessionRecord[]>('/api/auth/sessions');
+      setSessions(data);
+    } catch {
+      // ignore if demo
+    }
+  }, [user]);
+
+  useEffect(() => {
+    let active = true;
+    async function run() {
+      if (!user) return;
+      try {
+        const { data } = await apiRequest<SessionRecord[]>('/api/auth/sessions');
+        if (active) setSessions(data);
+      } catch {
+        // ignore
+      }
+    }
+    void run();
+    return () => {
+      active = false;
+    };
+  }, [user]);
+
+  async function handleChangePassword(e: FormEvent) {
+    e.preventDefault();
+    setStatusMessage(null);
+    setErrorMessage(null);
+    try {
+      await apiRequest('/api/auth/change-password', {
+        method: 'POST',
+        body: { currentPassword, newPassword },
+      });
+      setCurrentPassword('');
+      setNewPassword('');
+      setStatusMessage('Password updated successfully. Other sessions were signed out.');
+      await loadSessions();
+    } catch (err) {
+      setErrorMessage(err instanceof ApiClientError ? err.message : 'Failed to change password.');
+    }
+  }
+
+  async function handleRevokeSession(sessionId: string) {
+    setStatusMessage(null);
+    setErrorMessage(null);
+    try {
+      await apiRequest(`/api/auth/sessions/${sessionId}`, { method: 'DELETE' });
+      setStatusMessage('Session revoked.');
+      await loadSessions();
+    } catch (err) {
+      setErrorMessage(err instanceof ApiClientError ? err.message : 'Could not revoke session.');
+    }
+  }
+
+  async function handleLogoutAll() {
+    await apiRequest('/api/auth/logout-all', { method: 'POST' });
+    await logout();
+  }
+
+  if (!user) {
+    return (
+      <div className="ac-page">
+        <Intro eyebrow="ACCOUNT AND SESSION" title="Account security" copy="Sign in via the Login page to manage live passwords and active sessions." />
+        <section className="ac-panel">
+          <h2>Account details</h2>
+          <Details rows={[
+            ['Account identifier', roles[role].id],
+            ['Name', roles[role].person],
+            ['Portal', roles[role].label],
+            ['Authentication', 'Demo preview — sign in to use live backend sessions'],
+          ]} />
+        </section>
+      </div>
+    );
+  }
+
+  return (
+    <div className="ac-page">
+      <Intro eyebrow="ACCOUNT AND SESSION" title="Account security" copy="Manage your password and active backend sessions." />
+      {statusMessage && <p className="ac-success" role="status">{statusMessage}</p>}
+      {errorMessage && <p className="ac-note" role="alert" style={{ color: '#991b1b' }}>{errorMessage}</p>}
+
+      <section className="ac-panel">
+        <h2>Account details</h2>
+        <Details rows={[
+          ['Account identifier', user.student?.studentNumber || user.id],
+          ['Name', `${user.firstName} ${user.surname}`],
+          ['Email', user.email],
+          ['Role', roles[role].label],
+          ['Account status', user.isActive ? 'Active' : 'Inactive'],
+          ['Last sign-in', user.loggedInAt ? new Date(user.loggedInAt).toLocaleString() : 'Current session'],
+        ]} />
+      </section>
+
+      <section className="ac-panel">
+        <h2>Change password</h2>
+        <form className="ac-form" onSubmit={handleChangePassword}>
+          <div className="ac-form-grid">
+            <label>
+              Current password
+              <input
+                type="password"
+                required
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+              />
+            </label>
+            <label>
+              New password (min 8 characters)
+              <input
+                type="password"
+                required
+                minLength={8}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+            </label>
+          </div>
+          <button type="submit" className="ac-button">Update password</button>
+        </form>
+      </section>
+
+      <section className="ac-panel">
+        <div className="ac-panel-heading">
+          <div>
+            <h2>Active sessions ({sessions.length})</h2>
+            <p>Each login creates an audited JWT session.</p>
+          </div>
+          <button type="button" className="ac-outline" onClick={handleLogoutAll}>
+            Sign out all devices
+          </button>
+        </div>
+        <div className="ac-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Created</th>
+                <th>Last used</th>
+                <th>Client</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sessions.length ? (
+                sessions.map((s) => (
+                  <tr key={s.id}>
+                    <td>{new Date(s.createdAt).toLocaleString()}</td>
+                    <td>{s.lastUsedAt ? new Date(s.lastUsedAt).toLocaleString() : '—'}</td>
+                    <td>{s.userAgent ? s.userAgent.slice(0, 48) : s.ipAddress || 'Web client'}</td>
+                    <td>
+                      <button type="button" className="ac-outline" onClick={() => handleRevokeSession(s.id)}>
+                        Revoke
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4}>No active sessions found.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  );
 }
+
 function NotificationPreferences() {
   const [name, setName] = useState('Assessment reminders'); const [channel, setChannel] = useState('In-app');
   const [events, setEvents] = useState('Upcoming assignment and exam deadlines'); const [enabled, setEnabled] = useState(true);
@@ -40,6 +221,7 @@ function NotificationPreferences() {
   function submit(event: FormEvent) { event.preventDefault(); if (!name.trim() || !events.trim()) return; setPreferences([{ name: name.trim(), channel, events: events.trim(), enabled }, ...preferences]); setName(''); setEvents(''); }
   return <div className="ac-page"><Intro eyebrow="COMMUNICATION PREFERENCES" title="Notification preferences" copy="Prepare preferences for academic notices, assessments and student services." /><section className="ac-panel"><h2>New preference</h2><p className="ac-copy">These selections stay in this open view. They do not subscribe you to any external channel.</p><form className="ac-form" onSubmit={submit}><div className="ac-form-grid"><label>Preference name<input required value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Academic notices" /></label><label>Channel<select value={channel} onChange={e => setChannel(e.target.value)}>{['In-app','Email','SMS','Push','WhatsApp / approved messaging API'].map(item => <option key={item}>{item}</option>)}</select></label></div><label>Events or topics<textarea required rows={3} value={events} onChange={e => setEvents(e.target.value)} /></label><label className="ac-checkbox"><input type="checkbox" checked={enabled} onChange={e => setEnabled(e.target.checked)} /> Enabled when service is connected</label><button className="ac-button" type="submit">Add sample preference</button></form></section><section className="ac-panel"><h2>Prepared preferences</h2><div className="ac-preferences">{preferences.map((item, index) => <article key={`${item.name}-${index}`}><div><strong>{item.name}</strong><p>{item.events}</p><small>{item.channel}</small></div><span className={`ac-pill ${item.enabled ? 'good' : ''}`}>{item.enabled ? 'Enabled in preview' : 'Disabled'}</span></article>)}</div></section></div>;
 }
+
 function Mailer({ role }: { role: RoleSlug }) {
   const [organisations, setOrganisations] = useState(initialOrganisations);
   const [messages, setMessages] = useState(initialMessages);

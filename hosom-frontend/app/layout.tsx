@@ -1,0 +1,24 @@
+import type { Metadata } from 'next';
+import './globals.css';
+import { AuthProvider } from '@/components/auth-provider';
+import { WorkflowProvider } from '@/components/workflow-provider';
+import './workflows.css';
+import './public-content.css';
+import '@/components/role-overview.css';
+import '@/components/management-content.css';
+import '@/components/account-content.css';
+import '@/components/learning-content.css';
+import '@/components/student-experience.css';
+import '@/components/student-assessments.css';
+import '@/components/student-results.css';
+import '@/components/student-finance.css';
+import '@/components/student-learning-overview.css';
+import '@/components/student-overview.css';
+import '@/components/student-courses.css';
+import '@/components/lecturer-overview.css';
+import '@/components/lecturer-courses.css';
+import '@/components/lecturer-materials.css';
+import '@/components/lecturer-pages.css';
+import '@/components/events-workspace.css';
+export const metadata: Metadata = { title: { default: 'HOSOM | Hope School of Ministry', template: '%s | HOSOM' }, description: 'Hope School of Ministry e-learning and academic management interface.' };
+export default function RootLayout({ children }: { children: React.ReactNode }) { return <html lang="en"><body><AuthProvider><WorkflowProvider>{children}</WorkflowProvider></AuthProvider></body></html>; }

@@ -1,43 +1,27 @@
 # HOSOM frontend
 
-Next.js frontend for the Hope School of Ministry E-Learning and Academic Management System. The public site and all role-specific workspaces follow the merged HOSOM UI prototype.
+Next.js frontend for the Hope School of Ministry E-Learning and Academic Management System. The public site and role-specific workspaces follow the merged HOSOM UI prototype.
 
-## Run
+## Run with the backend
 
-```bash
-npm ci
-npm run dev
-```
+1. Start the Express backend on `http://localhost:4000` (see the backend README and Postman testing guide).
+2. Copy `.env.example` to `.env.local` and set `NEXT_PUBLIC_API_URL=http://localhost:4000`.
+3. Install dependencies with `npm ci`.
+4. Start Next.js with `npm run dev` and open the local URL shown by Next.js.
+5. Use **Portal login** with an account created in the backend database. Login, current-user hydration, logout and account security/session screens call the backend API.
 
-Open the local URL shown by Next.js. Use **Portal login** to enter any of the ten demo workspaces without credentials. Choose a role from the selector or open a workspace directly.
+## Demo workspaces and integration status
+
+Credential-free demo access remains available for reviewing the interface. Those demo workspaces use illustrative records and in-memory React state. They are not authenticated server sessions and do not persist records to MySQL. The portal screens for student registration, programme/course administration, enrolment, materials, assignments, finance, results, announcements and reports still need to be connected domain-by-domain to the backend APIs. Do not use demo mode for real institutional records or treat demo role routes as access control.
 
 ## Interface structure
 
 - `app/` contains public pages and role/section App Router routes.
-- `components/` contains the public UI, role dashboards, learning pages, management pages, account pages and in-memory workflow views.
-- `lib/demo-data.ts` defines the role navigation and common illustrative records.
-- `lib/workflows.ts` defines seed records and a reducer for interactive workflow handoffs.
-- `lib/*-routing.ts` assigns each role section to a dedicated screen.
+- `components/` contains the public UI, role dashboards, learning pages, management pages and account pages.
+- `lib/api.ts` contains the shared backend API client, role mapping and response/error handling.
+- `lib/demo-data.ts` and `lib/workflows.ts` provide illustrative data and demo workflow state.
 - `public/demo/` contains sample course documents and media from the UI prototype.
 
-The public site includes About, Programmes, the 20-module curriculum and a four-step application form. Student and Lecturer areas include course learning, library/materials, timetable/live classes, attendance, profiles, reports and academic records. Management roles include department-specific catalogues, registers, oversight, reporting and system administration views.
+## Backend contract
 
-## In-memory demonstration
-
-The frontend does not use `localStorage`, `sessionStorage`, or IndexedDB. Workflow state exists only in React memory and resets on refresh. Where a screen uses local component state, leaving that screen also resets its draft.
-
-The cross-role demo processes include:
-
-- Application → Secretariat selection/admission → Head of Programs approval → Secretariat publication/enrolment.
-- Lecturer assessment authoring → exam approval/scheduling → student submission → lecturer marking → Head of Programs review → Secretariat publication → student result.
-- Lecturer resource drafting/publication → student access and completion.
-- Student sample payment → Finance confirmation → updated fee balance and receipt view.
-- Requisition submission → Head of HOSOM forwarding → Director approval → Finance sample payment initiation.
-- Staff announcements, events and selected communication previews.
-
-These are interface demonstrations. Credential-free demo access is intentionally enabled for implementation review. The frontend does not authenticate users, save uploads, deliver messages, transfer funds or enforce server permissions. Do not use this preview with real private records or expose it as a production system. Those responsibilities belong to the separate backend. Role routes are previews, not access control.
-
-## Backend integration
-
-Keep authentication and API contracts at a service boundary. Replace demo reads and reducer actions with requests to the independent backend, and enforce roles and record scope there. Integrate by domain: accounts and academic catalogue, enrolment, learning resources, assessments and results, then finance and communications. Uploaded media should use backend-managed storage.
-# hosom-frontend
+The Express backend is separate. Its Phase 1 API and SRS mapping are documented in the backend project's `docs/api-requirements-mapping.md`. The API base URL is read from `NEXT_PUBLIC_API_URL` and defaults to `http://localhost:4000` for local development. Configure the backend's `CORS_ORIGINS` to include the exact frontend origin.

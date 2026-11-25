@@ -25,9 +25,9 @@ export default function LoginPage() {
       <main className="login-main">
         <div className="login-card">
           <p className="eyebrow">PORTAL ACCESS</p>
-          <h2>Choose your HOSOM workspace</h2>
+          <h2>Sign in to HOSOM HELMS</h2>
           <p>
-            Select the workspace you want to explore. Temporary demo access is enabled, so you do not need login credentials.
+            Enter your HOSOM email and password to open your role-based workspace.
           </p>
           <LoginForm />
         </div>
