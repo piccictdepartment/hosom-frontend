@@ -1,0 +1,43 @@
+import { notFound } from 'next/navigation';
+import type { RoleSlug } from '@/lib/demo-data';
+import { RoleOverview } from '@/components/portal/role-overview';
+import { StudentOverview } from '@/components/student/student-overview';
+import { LecturerOverview } from '@/components/lecturer/lecturer-overview';
+import { StudentCourses } from '@/components/student/student-courses';
+import { LecturerCourses } from '@/components/lecturer/lecturer-courses';
+import { LecturerMaterials } from '@/components/lecturer/lecturer-materials';
+import { LecturerLiveClasses, LecturerStudents, LecturerProfile } from '@/components/lecturer/lecturer-pages';
+import { LecturerAssignments, LecturerQuizzes, LecturerMarking } from '@/components/lecturer/lecturer-assessments';
+import { LecturerAnnouncements, LecturerMessages } from '@/components/lecturer/lecturer-communications';
+import { LearningContent } from '@/components/portal/learning-content';
+import { AccountContent } from '@/components/portal/account-content';
+import { ManagementContent } from '@/components/portal/management-content';
+import { WorkflowWorkspace } from '@/components/portal/workflow-workspace';
+import { StudentAssessments, StudentFinance, StudentResults } from '@/components/student/student-experience';
+import { supportsLearningContent } from '@/lib/learning-routing';
+import { supportsAccountContent } from '@/lib/account-routing';
+import { supportsManagementContent } from '@/lib/management-routing';
+import { supportsWorkflow } from '@/lib/workflow-routing';
+
+export function PortalSection({ role, section }: { role: RoleSlug; section: string }) {
+  if (section === 'Overview') return role === 'student' ? <StudentOverview /> : role === 'lecturer' ? <LecturerOverview /> : <RoleOverview role={role} />;
+  if (role === 'student' && section === 'My Courses') return <StudentCourses />;
+  if (role === 'lecturer' && section === 'My Courses') return <LecturerCourses />;
+  if (role === 'lecturer' && section === 'Materials') return <LecturerMaterials />;
+  if (role === 'lecturer' && section === 'Live Classes') return <LecturerLiveClasses />;
+  if (role === 'lecturer' && section === 'Enrolled Students') return <LecturerStudents />;
+  if (role === 'lecturer' && section === 'My Lecturer Profile') return <LecturerProfile />;
+  if (role === 'lecturer' && section === 'Assignments') return <LecturerAssignments />;
+  if (role === 'lecturer' && section === 'Quizzes & Exams') return <LecturerQuizzes />;
+  if (role === 'lecturer' && (section === 'Submissions' || section === 'Marks')) return <LecturerMarking section={section} />;
+  if (role === 'lecturer' && section === 'Announcements') return <LecturerAnnouncements />;
+  if (role === 'lecturer' && section === 'Notifications') return <LecturerMessages section={section} />;
+  if (role === 'student' && section === 'Assessments') return <StudentAssessments />;
+  if (role === 'student' && section === 'Fees') return <StudentFinance />;
+  if (role === 'student' && section === 'Results') return <StudentResults />;
+  if (supportsLearningContent(role, section)) return <LearningContent role={role} section={section} />;
+  if (supportsAccountContent(role, section)) return <AccountContent role={role} section={section} />;
+  if (supportsManagementContent(role, section)) return <ManagementContent role={role} section={section} />;
+  if (supportsWorkflow(role, section)) return <WorkflowWorkspace role={role} section={section} />;
+  notFound();
+}

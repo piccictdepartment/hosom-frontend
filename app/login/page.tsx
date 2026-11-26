@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Brand } from '@/components/brand';
-import { LoginForm } from '@/components/login-form';
+import { Brand } from '@/components/site/brand';
+import { LoginForm } from '@/components/site/login-form';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export const metadata: Metadata = {
   title: 'Login | Portal Access',
@@ -23,14 +24,18 @@ export default function LoginPage() {
         <Link href="/">← Back to homepage</Link>
       </div>
       <main className="login-main">
-        <div className="login-card">
-          <p className="eyebrow">PORTAL ACCESS</p>
-          <h2>Sign in to HOSOM HELMS</h2>
-          <p>
-            Enter your HOSOM email and password to open your role-based workspace.
-          </p>
-          <LoginForm />
-        </div>
+        <Card className="login-card">
+          <CardHeader>
+            <p className="eyebrow">PORTAL ACCESS</p>
+            <CardTitle>Sign in to HOSOM HELMS</CardTitle>
+            <CardDescription>
+              Enter your HOSOM email and password to open your role-based workspace.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <LoginForm />
+          </CardContent>
+        </Card>
       </main>
     </div>
   );

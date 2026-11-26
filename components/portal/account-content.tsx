@@ -1,0 +1,771 @@
+'use client';
+
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useAuth } from '@/components/providers/auth-provider';
+import { ApiClientError, apiRequest, type SessionRecord } from '@/lib/api';
+import { roles, type RoleSlug } from '@/lib/demo-data';
+
+type Organisation = {
+  id: string;
+  name: string;
+  email: string;
+  contact: string;
+  phone: string;
+  address: string;
+};
+type Message = {
+  id: string;
+  subject: string;
+  body: string;
+  recipients: string[];
+  cc: string;
+  bcc: string;
+  author: string;
+  date: string;
+  attachments: string[];
+};
+
+const initialOrganisations: Organisation[] = [
+  {
+    id: 'ORG-001',
+    name: 'Grace Community Foundation',
+    email: 'partnerships@grace-foundation.example',
+    contact: 'Martha Banda',
+    phone: '+265 888 000 101',
+    address: 'Lilongwe, Malawi',
+  },
+  {
+    id: 'ORG-002',
+    name: 'Hope Education Network',
+    email: 'office@hope-education.example',
+    contact: 'David Tembo',
+    phone: '+265 888 000 102',
+    address: 'Blantyre, Malawi',
+  },
+  {
+    id: 'ORG-003',
+    name: 'Unity Ministry Partners',
+    email: 'contact@unity-ministry.example',
+    contact: 'Sarah Phiri',
+    phone: '+265 888 000 103',
+    address: 'Mzuzu, Malawi',
+  },
+];
+const initialMessages: Message[] = [
+  {
+    id: 'EXT-DEMO-002',
+    subject: 'Invitation to our partnership meeting',
+    body: 'We would like to invite Grace Community Foundation to a partnership meeting at HOSOM.',
+    recipients: ['ORG-001'],
+    cc: '',
+    bcc: '',
+    author: 'Secretariat',
+    date: '25 Oct 2026',
+    attachments: ['Partnership meeting agenda.txt'],
+  },
+  {
+    id: 'EXT-DEMO-001',
+    subject: 'Exploring academic collaboration',
+    body: 'We would welcome a conversation about shared training opportunities and learning resources.',
+    recipients: ['ORG-002', 'ORG-003'],
+    cc: '',
+    bcc: '',
+    author: 'Director / Chancellor',
+    date: '23 Oct 2026',
+    attachments: [],
+  },
+];
+
+function Intro({ eyebrow, title, copy }: { eyebrow: string; title: string; copy: string }) {
+  return (
+    <div className="ac-intro">
+      <p className="eyebrow">{eyebrow}</p>
+      <h1>{title}</h1>
+      <p>{copy}</p>
+    </div>
+  );
+}
+function Details({ rows }: { rows: [string, string][] }) {
+  return (
+    <dl className="ac-details">
+      {rows.map(([name, value]) => (
+        <div key={name}>
+          <dt>{name}</dt>
+          <dd>{value || 'Not recorded'}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+export function AccountContent({ role, section }: { role: RoleSlug; section: string }) {
+  if (section === 'Account Security') return <AccountSecurity role={role} />;
+  if (section === 'Notification Preferences') return <NotificationPreferences />;
+  return <Mailer role={role} />;
+}
+
+export function AccountSecurity({ role }: { role: RoleSlug }) {
+  const { user, logout } = useAuth();
+  const [sessions, setSessions] = useState<SessionRecord[]>([]);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const loadSessions = useCallback(async () => {
+    if (!user) return;
+    try {
+      const { data } = await apiRequest<SessionRecord[]>('/api/auth/sessions');
+      setSessions(data);
+    } catch {
+      // ignore if demo
+    }
+  }, [user]);
+
+  useEffect(() => {
+    let active = true;
+    async function run() {
+      if (!user) return;
+      try {
+        const { data } = await apiRequest<SessionRecord[]>('/api/auth/sessions');
+        if (active) setSessions(data);
+      } catch {
+        // ignore
+      }
+    }
+    void run();
+    return () => {
+      active = false;
+    };
+  }, [user]);
+
+  async function handleChangePassword(e: FormEvent) {
+    e.preventDefault();
+    setStatusMessage(null);
+    setErrorMessage(null);
+    try {
+      await apiRequest('/api/auth/change-password', {
+        method: 'POST',
+        body: { currentPassword, newPassword },
+      });
+      setCurrentPassword('');
+      setNewPassword('');
+      setStatusMessage('Password updated successfully. Other sessions were signed out.');
+      await loadSessions();
+    } catch (err) {
+      setErrorMessage(err instanceof ApiClientError ? err.message : 'Failed to change password.');
+    }
+  }
+
+  async function handleRevokeSession(sessionId: string) {
+    setStatusMessage(null);
+    setErrorMessage(null);
+    try {
+      await apiRequest(`/api/auth/sessions/${sessionId}`, { method: 'DELETE' });
+      setStatusMessage('Session revoked.');
+      await loadSessions();
+    } catch (err) {
+      setErrorMessage(err instanceof ApiClientError ? err.message : 'Could not revoke session.');
+    }
+  }
+
+  async function handleLogoutAll() {
+    await apiRequest('/api/auth/logout-all', { method: 'POST' });
+    await logout();
+  }
+
+  if (!user) {
+    return (
+      <div className="ac-page">
+        <Intro
+          eyebrow="ACCOUNT AND SESSION"
+          title="Account security"
+          copy="Sign in via the Login page to manage live passwords and active sessions."
+        />
+        <section className="ac-panel">
+          <h2>Account details</h2>
+          <Details
+            rows={[
+              ['Account identifier', roles[role].id],
+              ['Name', roles[role].person],
+              ['Portal', roles[role].label],
+              ['Authentication', 'Demo preview — sign in to use live backend sessions'],
+            ]}
+          />
+        </section>
+      </div>
+    );
+  }
+
+  return (
+    <div className="ac-page">
+      <Intro
+        eyebrow="ACCOUNT AND SESSION"
+        title="Account security"
+        copy="Manage your password and active backend sessions."
+      />
+      {statusMessage && (
+        <p className="ac-success" role="status">
+          {statusMessage}
+        </p>
+      )}
+      {errorMessage && (
+        <p className="ac-note" role="alert" style={{ color: '#991b1b' }}>
+          {errorMessage}
+        </p>
+      )}
+
+      <section className="ac-panel">
+        <h2>Account details</h2>
+        <Details
+          rows={[
+            ['Account identifier', user.student?.studentNumber || user.id],
+            ['Name', `${user.firstName} ${user.surname}`],
+            ['Email', user.email],
+            ['Role', roles[role].label],
+            ['Account status', user.isActive ? 'Active' : 'Inactive'],
+            [
+              'Last sign-in',
+              user.loggedInAt ? new Date(user.loggedInAt).toLocaleString() : 'Current session',
+            ],
+          ]}
+        />
+      </section>
+
+      <section className="ac-panel">
+        <h2>Change password</h2>
+        <form className="ac-form" onSubmit={handleChangePassword}>
+          <div className="ac-form-grid">
+            <label>
+              Current password
+              <input
+                type="password"
+                required
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+              />
+            </label>
+            <label>
+              New password (min 8 characters)
+              <input
+                type="password"
+                required
+                minLength={8}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+            </label>
+          </div>
+          <button type="submit" className="ac-button">
+            Update password
+          </button>
+        </form>
+      </section>
+
+      <section className="ac-panel">
+        <div className="ac-panel-heading">
+          <div>
+            <h2>Active sessions ({sessions.length})</h2>
+            <p>Each login creates an audited JWT session.</p>
+          </div>
+          <button type="button" className="ac-outline" onClick={handleLogoutAll}>
+            Sign out all devices
+          </button>
+        </div>
+        <div className="ac-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Created</th>
+                <th>Last used</th>
+                <th>Client</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sessions.length ? (
+                sessions.map((s) => (
+                  <tr key={s.id}>
+                    <td>{new Date(s.createdAt).toLocaleString()}</td>
+                    <td>{s.lastUsedAt ? new Date(s.lastUsedAt).toLocaleString() : '—'}</td>
+                    <td>{s.userAgent ? s.userAgent.slice(0, 48) : s.ipAddress || 'Web client'}</td>
+                    <td>
+                      <button
+                        type="button"
+                        className="ac-outline"
+                        onClick={() => handleRevokeSession(s.id)}
+                      >
+                        Revoke
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4}>No active sessions found.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function NotificationPreferences() {
+  const [name, setName] = useState('Assessment reminders');
+  const [channel, setChannel] = useState('In-app');
+  const [events, setEvents] = useState('Upcoming assignment and exam deadlines');
+  const [enabled, setEnabled] = useState(true);
+  const [preferences, setPreferences] = useState<
+    { name: string; channel: string; events: string; enabled: boolean }[]
+  >([
+    {
+      name: 'Academic updates',
+      channel: 'In-app',
+      events: 'Course and academic announcements',
+      enabled: true,
+    },
+    {
+      name: 'Assessment reminders',
+      channel: 'Email',
+      events: 'Deadline reminders',
+      enabled: false,
+    },
+  ]);
+  function submit(event: FormEvent) {
+    event.preventDefault();
+    if (!name.trim() || !events.trim()) return;
+    setPreferences([
+      { name: name.trim(), channel, events: events.trim(), enabled },
+      ...preferences,
+    ]);
+    setName('');
+    setEvents('');
+  }
+  return (
+    <div className="ac-page">
+      <Intro
+        eyebrow="COMMUNICATION PREFERENCES"
+        title="Notification preferences"
+        copy="Prepare preferences for academic notices, assessments and student services."
+      />
+      <section className="ac-panel">
+        <h2>New preference</h2>
+        <p className="ac-copy">
+          These selections stay in this open view. They do not subscribe you to any external
+          channel.
+        </p>
+        <form className="ac-form" onSubmit={submit}>
+          <div className="ac-form-grid">
+            <label>
+              Preference name
+              <input
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g. Academic notices"
+              />
+            </label>
+            <label>
+              Channel
+              <select value={channel} onChange={(e) => setChannel(e.target.value)}>
+                {['In-app', 'Email', 'SMS', 'Push', 'WhatsApp / approved messaging API'].map(
+                  (item) => (
+                    <option key={item}>{item}</option>
+                  ),
+                )}
+              </select>
+            </label>
+          </div>
+          <label>
+            Events or topics
+            <textarea
+              required
+              rows={3}
+              value={events}
+              onChange={(e) => setEvents(e.target.value)}
+            />
+          </label>
+          <label className="ac-checkbox">
+            <input
+              type="checkbox"
+              checked={enabled}
+              onChange={(e) => setEnabled(e.target.checked)}
+            />{' '}
+            Enabled when service is connected
+          </label>
+          <button className="ac-button" type="submit">
+            Add sample preference
+          </button>
+        </form>
+      </section>
+      <section className="ac-panel">
+        <h2>Prepared preferences</h2>
+        <div className="ac-preferences">
+          {preferences.map((item, index) => (
+            <article key={`${item.name}-${index}`}>
+              <div>
+                <strong>{item.name}</strong>
+                <p>{item.events}</p>
+                <small>{item.channel}</small>
+              </div>
+              <span className={`ac-pill ${item.enabled ? 'good' : ''}`}>
+                {item.enabled ? 'Enabled in preview' : 'Disabled'}
+              </span>
+            </article>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function Mailer({ role }: { role: RoleSlug }) {
+  const [organisations, setOrganisations] = useState(initialOrganisations);
+  const [messages, setMessages] = useState(initialMessages);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [directoryQuery, setDirectoryQuery] = useState('');
+  const [messageQuery, setMessageQuery] = useState('');
+  const [adding, setAdding] = useState(false);
+  const [newOrganisation, setNewOrganisation] = useState({
+    name: '',
+    email: '',
+    contact: '',
+    phone: '',
+    address: '',
+  });
+  const [subject, setSubject] = useState('');
+  const [body, setBody] = useState('');
+  const [cc, setCc] = useState('');
+  const [bcc, setBcc] = useState('');
+  const [attachments, setAttachments] = useState<string[]>([]);
+  const [active, setActive] = useState<Message | null>(null);
+  const [notice, setNotice] = useState('');
+  const filteredOrganisations = organisations.filter((o) =>
+    `${o.name} ${o.email} ${o.contact} ${o.address}`
+      .toLowerCase()
+      .includes(directoryQuery.toLowerCase()),
+  );
+  const filteredMessages = messages.filter((m) =>
+    `${m.subject} ${m.body} ${m.author} ${m.recipients.map((id) => organisations.find((o) => o.id === id)?.name || '').join(' ')}`
+      .toLowerCase()
+      .includes(messageQuery.toLowerCase()),
+  );
+  function addOrganisation(e: FormEvent) {
+    e.preventDefault();
+    if (!newOrganisation.name.trim() || !newOrganisation.email.trim()) return;
+    setOrganisations([
+      { ...newOrganisation, id: `ORG-DEMO-${organisations.length + 1}` },
+      ...organisations,
+    ]);
+    setNewOrganisation({ name: '', email: '', contact: '', phone: '', address: '' });
+    setAdding(false);
+  }
+  function send(e: FormEvent) {
+    e.preventDefault();
+    if (!selected.length || !subject.trim() || !body.trim()) return;
+    const message: Message = {
+      id: `EXT-DEMO-${messages.length + 1}`,
+      subject: subject.trim(),
+      body: body.trim(),
+      recipients: selected,
+      cc: cc.trim(),
+      bcc: bcc.trim(),
+      author: roles[role].label,
+      date: 'This open view',
+      attachments,
+    };
+    setMessages([message, ...messages]);
+    setSelected([]);
+    setSubject('');
+    setBody('');
+    setCc('');
+    setBcc('');
+    setAttachments([]);
+    setNotice('Demo email recorded in this view. No email was delivered.');
+  }
+  return (
+    <div className="ac-page ac-mailer">
+      <Intro
+        eyebrow="EXTERNAL COMMUNICATIONS"
+        title="Mailer"
+        copy="Keep partner contacts and outgoing correspondence in one place."
+      />
+      <div className="ac-summary">
+        <span>
+          <b>{organisations.length}</b> Organisations
+        </span>
+        <span>
+          <b>{messages.length}</b> Emails recorded
+        </span>
+        <span>
+          <b>{messages.filter((m) => m.author === roles[role].label).length}</b> From your office
+        </span>
+      </div>
+      <p className="ac-note">
+        Mailer preview · Sending is simulated. Messages, contacts and attachment names are held in
+        memory only.
+      </p>
+      {notice && (
+        <p className="ac-success" role="status">
+          {notice}
+        </p>
+      )}
+      <div className="ac-mail-grid">
+        <section className="ac-panel">
+          <div className="ac-panel-heading">
+            <div>
+              <h2>Organisations</h2>
+              <p>Select recipients for your message.</p>
+            </div>
+            <button className="ac-outline" onClick={() => setAdding(!adding)}>
+              {adding ? 'Cancel' : '+ Add organisation'}
+            </button>
+          </div>
+          {adding && (
+            <form className="ac-form ac-org-form" onSubmit={addOrganisation}>
+              <label>
+                Name
+                <input
+                  required
+                  value={newOrganisation.name}
+                  onChange={(e) => setNewOrganisation({ ...newOrganisation, name: e.target.value })}
+                />
+              </label>
+              <label>
+                Email
+                <input
+                  type="email"
+                  required
+                  value={newOrganisation.email}
+                  onChange={(e) =>
+                    setNewOrganisation({ ...newOrganisation, email: e.target.value })
+                  }
+                />
+              </label>
+              <div className="ac-form-grid">
+                <label>
+                  Contact
+                  <input
+                    value={newOrganisation.contact}
+                    onChange={(e) =>
+                      setNewOrganisation({ ...newOrganisation, contact: e.target.value })
+                    }
+                  />
+                </label>
+                <label>
+                  Phone
+                  <input
+                    value={newOrganisation.phone}
+                    onChange={(e) =>
+                      setNewOrganisation({ ...newOrganisation, phone: e.target.value })
+                    }
+                  />
+                </label>
+              </div>
+              <label>
+                Address
+                <input
+                  value={newOrganisation.address}
+                  onChange={(e) =>
+                    setNewOrganisation({ ...newOrganisation, address: e.target.value })
+                  }
+                />
+              </label>
+              <button className="ac-button" type="submit">
+                Add contact
+              </button>
+            </form>
+          )}
+          <label className="ac-search-label">
+            Search directory
+            <input
+              type="search"
+              value={directoryQuery}
+              onChange={(e) => setDirectoryQuery(e.target.value)}
+              placeholder="Name, email or contact"
+            />
+          </label>
+          <p className="ac-small">{selected.length} selected</p>
+          <div className="ac-organisation-list">
+            {filteredOrganisations.map((o) => (
+              <label key={o.id} className={selected.includes(o.id) ? 'selected' : ''}>
+                <input
+                  type="checkbox"
+                  checked={selected.includes(o.id)}
+                  onChange={(e) =>
+                    setSelected(
+                      e.target.checked ? [...selected, o.id] : selected.filter((id) => id !== o.id),
+                    )
+                  }
+                />
+                <span>
+                  <strong>{o.name}</strong>
+                  <small>{o.email}</small>
+                  <small>
+                    {o.contact} · {o.address}
+                  </small>
+                </span>
+              </label>
+            ))}
+          </div>
+        </section>
+        <section className="ac-panel">
+          <div className="ac-panel-heading">
+            <div>
+              <h2>Compose email</h2>
+              <p>Prepared from {roles[role].label}.</p>
+            </div>
+            <span className="ac-pill">Demo only</span>
+          </div>
+          <form className="ac-form" onSubmit={send}>
+            <div className="ac-selected">
+              <strong>To · {selected.length} selected</strong>
+              {selected.length ? (
+                <p>
+                  {organisations
+                    .filter((o) => selected.includes(o.id))
+                    .map((o) => o.name)
+                    .join(', ')}
+                </p>
+              ) : (
+                <p>Choose one or more organisations from the directory.</p>
+              )}
+            </div>
+            <div className="ac-form-grid">
+              <label>
+                CC
+                <input
+                  type="text"
+                  value={cc}
+                  onChange={(e) => setCc(e.target.value)}
+                  placeholder="Addresses separated by commas"
+                />
+              </label>
+              <label>
+                BCC
+                <input
+                  type="text"
+                  value={bcc}
+                  onChange={(e) => setBcc(e.target.value)}
+                  placeholder="Addresses separated by commas"
+                />
+              </label>
+            </div>
+            <label>
+              Subject
+              <input
+                required
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                placeholder="Email subject"
+              />
+            </label>
+            <label>
+              Message
+              <textarea
+                required
+                rows={7}
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                placeholder="Write your message"
+              />
+            </label>
+            <label>
+              Attachment names
+              <input
+                type="file"
+                multiple
+                onChange={(e) =>
+                  setAttachments(Array.from(e.target.files || []).map((file) => file.name))
+                }
+              />
+              <small>
+                Only file names appear in this preview. Files are not read, uploaded or saved.
+              </small>
+            </label>
+            {attachments.length > 0 && (
+              <p className="ac-small">Selected: {attachments.join(', ')}</p>
+            )}
+            <button className="ac-button" type="submit" disabled={!selected.length}>
+              Record demo email
+            </button>
+          </form>
+        </section>
+      </div>
+      <section className="ac-panel">
+        <div className="ac-panel-heading">
+          <div>
+            <h2>Sent activity</h2>
+            <p>{messages.length} demo records</p>
+          </div>
+          <input
+            type="search"
+            aria-label="Search sent emails"
+            value={messageQuery}
+            onChange={(e) => setMessageQuery(e.target.value)}
+            placeholder="Search sent emails"
+          />
+        </div>
+        <div className="ac-message-list">
+          {filteredMessages.map((m) => (
+            <button key={m.id} onClick={() => setActive(m)}>
+              <strong>{m.subject}</strong>
+              <span>
+                To:{' '}
+                {m.recipients
+                  .map((id) => organisations.find((o) => o.id === id)?.name || id)
+                  .join(', ')}
+              </span>
+              <small>
+                {m.author} · {m.date}
+              </small>
+              <em>View →</em>
+            </button>
+          ))}
+        </div>
+        {!filteredMessages.length && <p className="ac-small">No messages match your search.</p>}
+      </section>
+      {active && (
+        <div className="ac-modal-backdrop" onClick={() => setActive(null)}>
+          <section
+            className="ac-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Sent email"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button className="ac-modal-close" onClick={() => setActive(null)} aria-label="Close">
+              ×
+            </button>
+            <p className="eyebrow">SENT EMAIL · DEMO</p>
+            <h2>{active.subject}</h2>
+            <Details
+              rows={[
+                ['From', active.author],
+                [
+                  'To',
+                  active.recipients
+                    .map((id) => organisations.find((o) => o.id === id)?.email || id)
+                    .join('; '),
+                ],
+                ['CC', active.cc],
+                ['BCC', active.bcc],
+                ['Date', active.date],
+              ]}
+            />
+            <p className="ac-mail-body">{active.body}</p>
+            <h3>Attachments</h3>
+            <p>{active.attachments.length ? active.attachments.join(', ') : 'No attachments'}</p>
+            <p className="ac-small">No external delivery occurred.</p>
+            <button className="ac-outline" onClick={() => setActive(null)}>
+              Close
+            </button>
+          </section>
+        </div>
+      )}
+    </div>
+  );
+}

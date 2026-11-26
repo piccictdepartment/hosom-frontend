@@ -4,187 +4,1791 @@ import type { WorkflowState } from './workflows';
 export type ContentRow = Record<string, string>;
 export type ContentStat = { label: string; value: string; detail: string };
 export type ContentCard = { title: string; detail: string; meta?: string };
-export type ContentSpec = { kicker: string; title: string; description: string; stats: ContentStat[]; columns: string[]; rows: ContentRow[]; cards: ContentCard[]; tableTitle: string; note?: string; variant?: 'directory' | 'analytics' | 'library' | 'register' | 'settings' };
-const metric = (label: string, value: string | number, detail: string): ContentStat => ({ label, value: String(value), detail });
-const row = (...pairs: [string, string | number][]): ContentRow => Object.fromEntries(pairs.map(([key, value]) => [key, String(value)]));
-const page = (kicker: string, title: string, description: string, rows: ContentRow[], stats: ContentStat[], cards: ContentCard[], options: Partial<ContentSpec> = {}): ContentSpec => ({ kicker, title, description, rows, columns: Object.keys(rows[0] ?? {}), stats, cards, tableTitle: options.tableTitle ?? 'Records', note: options.note, variant: options.variant ?? 'register' });
-const demoNote = 'Illustrative records from the HOSOM UI prototype. The operational service will supply live data.';
+export type ContentSpec = {
+  kicker: string;
+  title: string;
+  description: string;
+  stats: ContentStat[];
+  columns: string[];
+  rows: ContentRow[];
+  cards: ContentCard[];
+  tableTitle: string;
+  note?: string;
+  variant?: 'directory' | 'analytics' | 'library' | 'register' | 'settings';
+};
+const metric = (label: string, value: string | number, detail: string): ContentStat => ({
+  label,
+  value: String(value),
+  detail,
+});
+const row = (...pairs: [string, string | number][]): ContentRow =>
+  Object.fromEntries(pairs.map(([key, value]) => [key, String(value)]));
+const page = (
+  kicker: string,
+  title: string,
+  description: string,
+  rows: ContentRow[],
+  stats: ContentStat[],
+  cards: ContentCard[],
+  options: Partial<ContentSpec> = {},
+): ContentSpec => ({
+  kicker,
+  title,
+  description,
+  rows,
+  columns: Object.keys(rows[0] ?? {}),
+  stats,
+  cards,
+  tableTitle: options.tableTitle ?? 'Records',
+  note: options.note,
+  variant: options.variant ?? 'register',
+});
+const demoNote =
+  'Illustrative records from the HOSOM UI prototype. The operational service will supply live data.';
 
 const staff = [
-  row(['Staff ID','STF-001'],['Name','Esther Nkhoma'],['Designation','Administration Officer'],['Department','Administration'],['Contact','esther.nkhoma@example.org'],['Status','Active']),
-  row(['Staff ID','STF-002'],['Name','Patrick Mbewe'],['Designation','Records Officer'],['Department','Administration'],['Contact','patrick.mbewe@example.org'],['Status','Active']),
-  row(['Staff ID','STF-003'],['Name','Chifundo Phiri'],['Designation','Operations Coordinator'],['Department','Administration'],['Contact','chifundo.phiri@example.org'],['Status','Active']),
-  row(['Staff ID','STF-004'],['Name','Grace Banda'],['Designation','Lecturer'],['Department','Academics'],['Contact','grace.banda@example.org'],['Status','Active']),
-  row(['Staff ID','STF-005'],['Name','Daniel Kamanga'],['Designation','Finance Officer'],['Department','Finance'],['Contact','daniel.kamanga@example.org'],['Status','Active']),
-  row(['Staff ID','STF-006'],['Name','Thoko Mwale'],['Designation','Media Officer'],['Department','Media'],['Contact','thoko.mwale@example.org'],['Status','Active']),
-  row(['Staff ID','STF-007'],['Name','Lydia Chirwa'],['Designation','Office Assistant'],['Department','Administration'],['Contact','lydia.chirwa@example.org'],['Status','Inactive']),
+  row(
+    ['Staff ID', 'STF-001'],
+    ['Name', 'Esther Nkhoma'],
+    ['Designation', 'Administration Officer'],
+    ['Department', 'Administration'],
+    ['Contact', 'esther.nkhoma@example.org'],
+    ['Status', 'Active'],
+  ),
+  row(
+    ['Staff ID', 'STF-002'],
+    ['Name', 'Patrick Mbewe'],
+    ['Designation', 'Records Officer'],
+    ['Department', 'Administration'],
+    ['Contact', 'patrick.mbewe@example.org'],
+    ['Status', 'Active'],
+  ),
+  row(
+    ['Staff ID', 'STF-003'],
+    ['Name', 'Chifundo Phiri'],
+    ['Designation', 'Operations Coordinator'],
+    ['Department', 'Administration'],
+    ['Contact', 'chifundo.phiri@example.org'],
+    ['Status', 'Active'],
+  ),
+  row(
+    ['Staff ID', 'STF-004'],
+    ['Name', 'Grace Banda'],
+    ['Designation', 'Lecturer'],
+    ['Department', 'Academics'],
+    ['Contact', 'grace.banda@example.org'],
+    ['Status', 'Active'],
+  ),
+  row(
+    ['Staff ID', 'STF-005'],
+    ['Name', 'Daniel Kamanga'],
+    ['Designation', 'Finance Officer'],
+    ['Department', 'Finance'],
+    ['Contact', 'daniel.kamanga@example.org'],
+    ['Status', 'Active'],
+  ),
+  row(
+    ['Staff ID', 'STF-006'],
+    ['Name', 'Thoko Mwale'],
+    ['Designation', 'Media Officer'],
+    ['Department', 'Media'],
+    ['Contact', 'thoko.mwale@example.org'],
+    ['Status', 'Active'],
+  ),
+  row(
+    ['Staff ID', 'STF-007'],
+    ['Name', 'Lydia Chirwa'],
+    ['Designation', 'Office Assistant'],
+    ['Department', 'Administration'],
+    ['Contact', 'lydia.chirwa@example.org'],
+    ['Status', 'Inactive'],
+  ),
 ];
 const adminRecords = [
-  row(['Reference','REC-2026-014'],['Record','Semester coordination minutes'],['Category','Meeting'],['Owner','Administration'],['Action','Head of Programs review'],['Status','For review']),
-  row(['Reference','REC-2026-013'],['Record','Student support desk update'],['Category','Operations'],['Owner','Administration'],['Action','Keep as document'],['Status','Needs action']),
-  row(['Reference','REC-2026-012'],['Record','Teaching resource request'],['Category','Requisition'],['Owner','Academics'],['Action','Director approval'],['Status','Pending']),
+  row(
+    ['Reference', 'REC-2026-014'],
+    ['Record', 'Semester coordination minutes'],
+    ['Category', 'Meeting'],
+    ['Owner', 'Administration'],
+    ['Action', 'Head of Programs review'],
+    ['Status', 'For review'],
+  ),
+  row(
+    ['Reference', 'REC-2026-013'],
+    ['Record', 'Student support desk update'],
+    ['Category', 'Operations'],
+    ['Owner', 'Administration'],
+    ['Action', 'Keep as document'],
+    ['Status', 'Needs action'],
+  ),
+  row(
+    ['Reference', 'REC-2026-012'],
+    ['Record', 'Teaching resource request'],
+    ['Category', 'Requisition'],
+    ['Owner', 'Academics'],
+    ['Action', 'Director approval'],
+    ['Status', 'Pending'],
+  ),
 ];
 const adminDocs = [
-  row(['Reference','DOC-2026-041'],['Document','Semester coordination minutes'],['Category','Meeting minutes'],['Owner','Administration'],['Version','v2'],['Status','Approved']),
-  row(['Reference','DOC-2026-039'],['Document','Academic operations circular'],['Category','Circular'],['Owner','Academic office'],['Version','v1'],['Status','Approved']),
-  row(['Reference','DOC-2026-036'],['Document','Student support desk procedure'],['Category','Procedure'],['Owner','Secretariat'],['Version','v1'],['Status','Draft']),
+  row(
+    ['Reference', 'DOC-2026-041'],
+    ['Document', 'Semester coordination minutes'],
+    ['Category', 'Meeting minutes'],
+    ['Owner', 'Administration'],
+    ['Version', 'v2'],
+    ['Status', 'Approved'],
+  ),
+  row(
+    ['Reference', 'DOC-2026-039'],
+    ['Document', 'Academic operations circular'],
+    ['Category', 'Circular'],
+    ['Owner', 'Academic office'],
+    ['Version', 'v1'],
+    ['Status', 'Approved'],
+  ),
+  row(
+    ['Reference', 'DOC-2026-036'],
+    ['Document', 'Student support desk procedure'],
+    ['Category', 'Procedure'],
+    ['Owner', 'Secretariat'],
+    ['Version', 'v1'],
+    ['Status', 'Draft'],
+  ),
 ];
 const reportRows = [
-  row(['Report','Applications and admissions'],['Area','Secretariat'],['Period','2026 · Semester 2'],['Format','CSV / PDF'],['Status','Available']),
-  row(['Report','Programme enrolment'],['Area','Academics'],['Period','2026 · Semester 2'],['Format','CSV / PDF'],['Status','Available']),
-  row(['Report','Assessments and results'],['Area','Academics'],['Period','2026 · Semester 2'],['Format','CSV / PDF'],['Status','Review']),
-  row(['Report','Fee collection summary'],['Area','Finance'],['Period','2026 · Semester 2'],['Format','CSV / PDF'],['Status','Available']),
+  row(
+    ['Report', 'Applications and admissions'],
+    ['Area', 'Secretariat'],
+    ['Period', '2026 · Semester 2'],
+    ['Format', 'CSV / PDF'],
+    ['Status', 'Available'],
+  ),
+  row(
+    ['Report', 'Programme enrolment'],
+    ['Area', 'Academics'],
+    ['Period', '2026 · Semester 2'],
+    ['Format', 'CSV / PDF'],
+    ['Status', 'Available'],
+  ),
+  row(
+    ['Report', 'Assessments and results'],
+    ['Area', 'Academics'],
+    ['Period', '2026 · Semester 2'],
+    ['Format', 'CSV / PDF'],
+    ['Status', 'Review'],
+  ),
+  row(
+    ['Report', 'Fee collection summary'],
+    ['Area', 'Finance'],
+    ['Period', '2026 · Semester 2'],
+    ['Format', 'CSV / PDF'],
+    ['Status', 'Available'],
+  ),
 ];
-const academicRows = courses.map(c => row(['Code',c.code],['Course',c.name],['Programme',c.code === 'MN202' ? 'CM-01' : 'DT-02'],['Lecturer',c.lecturer],['Enrolled',c.students],['Status','Active']));
-const programmeRows = programmes.map(p => row(['Code',p.code],['Programme',p.name],['Level',p.type],['Duration',p.duration],['Courses',p.code === 'CM-01' ? 4 : p.code === 'DT-02' ? 6 : 8],['Status',p.code === 'BM-04' ? 'Planned' : 'Active']));
+const academicRows = courses.map((c) =>
+  row(
+    ['Code', c.code],
+    ['Course', c.name],
+    ['Programme', c.code === 'MN202' ? 'CM-01' : 'DT-02'],
+    ['Lecturer', c.lecturer],
+    ['Enrolled', c.students],
+    ['Status', 'Active'],
+  ),
+);
+const programmeRows = programmes.map((p) =>
+  row(
+    ['Code', p.code],
+    ['Programme', p.name],
+    ['Level', p.type],
+    ['Duration', p.duration],
+    ['Courses', p.code === 'CM-01' ? 4 : p.code === 'DT-02' ? 6 : 8],
+    ['Status', p.code === 'BM-04' ? 'Planned' : 'Active'],
+  ),
+);
 const lecturerRows = [
-  row(['Staff ID','L-001'],['Lecturer','Dr. Daniel Phiri'],['Specialisation','Theology and biblical studies'],['Assigned courses','BI101, TH201'],['Status','Active']),
-  row(['Staff ID','L-002'],['Lecturer','Rev. Esther Banda'],['Specialisation','Ministry and leadership'],['Assigned courses','MN202'],['Status','Active']),
+  row(
+    ['Staff ID', 'L-001'],
+    ['Lecturer', 'Dr. Daniel Phiri'],
+    ['Specialisation', 'Theology and biblical studies'],
+    ['Assigned courses', 'BI101, TH201'],
+    ['Status', 'Active'],
+  ),
+  row(
+    ['Staff ID', 'L-002'],
+    ['Lecturer', 'Rev. Esther Banda'],
+    ['Specialisation', 'Ministry and leadership'],
+    ['Assigned courses', 'MN202'],
+    ['Status', 'Active'],
+  ),
 ];
 const mediaRows = [
-  row(['Reference','MED-001'],['Resource','Foundations of Theology · Week 4'],['Course','TH201'],['Type','Video'],['Scope','Enrolled students'],['Size','240 MB'],['Status','Available']),
-  row(['Reference','MED-002'],['Resource','Ministry leadership reading pack'],['Course','MN202'],['Type','PDF'],['Scope','Course staff only'],['Size','8 MB'],['Status','Draft']),
-  row(['Reference','MED-003'],['Resource','Biblical interpretation audio'],['Course','BI101'],['Type','Audio'],['Scope','Enrolled students'],['Size','38 MB'],['Status','Processing']),
+  row(
+    ['Reference', 'MED-001'],
+    ['Resource', 'Foundations of Theology · Week 4'],
+    ['Course', 'TH201'],
+    ['Type', 'Video'],
+    ['Scope', 'Enrolled students'],
+    ['Size', '240 MB'],
+    ['Status', 'Available'],
+  ),
+  row(
+    ['Reference', 'MED-002'],
+    ['Resource', 'Ministry leadership reading pack'],
+    ['Course', 'MN202'],
+    ['Type', 'PDF'],
+    ['Scope', 'Course staff only'],
+    ['Size', '8 MB'],
+    ['Status', 'Draft'],
+  ),
+  row(
+    ['Reference', 'MED-003'],
+    ['Resource', 'Biblical interpretation audio'],
+    ['Course', 'BI101'],
+    ['Type', 'Audio'],
+    ['Scope', 'Enrolled students'],
+    ['Size', '38 MB'],
+    ['Status', 'Processing'],
+  ),
 ];
 const userRows = [
-  row(['User ID','USR-001'],['Name','Demo Student A'],['Role','Student'],['Department','Students'],['MFA','Not required in sample'],['Status','Active']),
-  row(['User ID','USR-002'],['Name','Demo Lecturer'],['Role','Lecturer'],['Department','Academics'],['MFA','Enrolled (sample)'],['Status','Locked']),
-  row(['User ID','USR-003'],['Name','Demo Finance Officer'],['Role','Finance'],['Department','Finance'],['MFA','Enrolled (sample)'],['Status','Active']),
-  row(['User ID','USR-004'],['Name','Demo Administrator'],['Role','System Administrator'],['Department','ICT'],['MFA','Enrolled (sample)'],['Status','Active']),
-  row(['User ID','HOSOM/HEAD/001'],['Name','Head of HOSOM'],['Role','Head of HOSOM'],['Department','Leadership'],['MFA','Not provisioned'],['Status','Active']),
+  row(
+    ['User ID', 'USR-001'],
+    ['Name', 'Demo Student A'],
+    ['Role', 'Student'],
+    ['Department', 'Students'],
+    ['MFA', 'Not required in sample'],
+    ['Status', 'Active'],
+  ),
+  row(
+    ['User ID', 'USR-002'],
+    ['Name', 'Demo Lecturer'],
+    ['Role', 'Lecturer'],
+    ['Department', 'Academics'],
+    ['MFA', 'Enrolled (sample)'],
+    ['Status', 'Locked'],
+  ),
+  row(
+    ['User ID', 'USR-003'],
+    ['Name', 'Demo Finance Officer'],
+    ['Role', 'Finance'],
+    ['Department', 'Finance'],
+    ['MFA', 'Enrolled (sample)'],
+    ['Status', 'Active'],
+  ),
+  row(
+    ['User ID', 'USR-004'],
+    ['Name', 'Demo Administrator'],
+    ['Role', 'System Administrator'],
+    ['Department', 'ICT'],
+    ['MFA', 'Enrolled (sample)'],
+    ['Status', 'Active'],
+  ),
+  row(
+    ['User ID', 'HOSOM/HEAD/001'],
+    ['Name', 'Head of HOSOM'],
+    ['Role', 'Head of HOSOM'],
+    ['Department', 'Leadership'],
+    ['MFA', 'Not provisioned'],
+    ['Status', 'Active'],
+  ),
 ];
 const capabilities = [
-  row(['Role','Student'],['Primary access','Own learning records'],['Data boundary','Enrolled courses and own results'],['Status','Defined']),
-  row(['Role','Lecturer'],['Primary access','Assigned course delivery'],['Data boundary','Allocated courses only'],['Status','Defined']),
-  row(['Role','Secretariat'],['Primary access','Admissions and enrolment'],['Data boundary','Candidate and student registry'],['Status','Defined']),
-  row(['Role','Finance'],['Primary access','Fees and payments'],['Data boundary','Fee accounts and receipts'],['Status','Defined']),
-  row(['Role','Administration'],['Primary access','Institutional records'],['Data boundary','Staff and document register'],['Status','Defined']),
-  row(['Role','Head of Programs'],['Primary access','Programme and results review'],['Data boundary','Academic catalogue and approvals'],['Status','Defined']),
-  row(['Role','Head of HOSOM'],['Primary access','Institutional reports'],['Data boundary','School summaries'],['Status','Defined']),
-  row(['Role','Director / Chancellor'],['Primary access','Executive oversight'],['Data boundary','Institutional aggregates'],['Status','Defined']),
-  row(['Role','Media'],['Primary access','Learning media'],['Data boundary','Resource library'],['Status','Defined']),
-  row(['Role','System Administrator'],['Primary access','Accounts and configuration'],['Data boundary','Platform controls'],['Status','Defined']),
+  row(
+    ['Role', 'Student'],
+    ['Primary access', 'Own learning records'],
+    ['Data boundary', 'Enrolled courses and own results'],
+    ['Status', 'Defined'],
+  ),
+  row(
+    ['Role', 'Lecturer'],
+    ['Primary access', 'Assigned course delivery'],
+    ['Data boundary', 'Allocated courses only'],
+    ['Status', 'Defined'],
+  ),
+  row(
+    ['Role', 'Secretariat'],
+    ['Primary access', 'Admissions and enrolment'],
+    ['Data boundary', 'Candidate and student registry'],
+    ['Status', 'Defined'],
+  ),
+  row(
+    ['Role', 'Finance'],
+    ['Primary access', 'Fees and payments'],
+    ['Data boundary', 'Fee accounts and receipts'],
+    ['Status', 'Defined'],
+  ),
+  row(
+    ['Role', 'Administration'],
+    ['Primary access', 'Institutional records'],
+    ['Data boundary', 'Staff and document register'],
+    ['Status', 'Defined'],
+  ),
+  row(
+    ['Role', 'Head of Programs'],
+    ['Primary access', 'Programme and results review'],
+    ['Data boundary', 'Academic catalogue and approvals'],
+    ['Status', 'Defined'],
+  ),
+  row(
+    ['Role', 'Head of HOSOM'],
+    ['Primary access', 'Institutional reports'],
+    ['Data boundary', 'School summaries'],
+    ['Status', 'Defined'],
+  ),
+  row(
+    ['Role', 'Director / Chancellor'],
+    ['Primary access', 'Executive oversight'],
+    ['Data boundary', 'Institutional aggregates'],
+    ['Status', 'Defined'],
+  ),
+  row(
+    ['Role', 'Media'],
+    ['Primary access', 'Learning media'],
+    ['Data boundary', 'Resource library'],
+    ['Status', 'Defined'],
+  ),
+  row(
+    ['Role', 'System Administrator'],
+    ['Primary access', 'Accounts and configuration'],
+    ['Data boundary', 'Platform controls'],
+    ['Status', 'Defined'],
+  ),
 ];
 const academicSetup = [
-  row(['Period ID','AY-2026-S2'],['Academic year','2026'],['Period','Semester 2'],['Start','1 Aug 2026'],['End','18 Dec 2026'],['Status','Active']),
-  row(['Period ID','AY-2027-S1'],['Academic year','2027'],['Period','Semester 1'],['Start','11 Jan 2027'],['End','25 Jun 2027'],['Status','Draft']),
+  row(
+    ['Period ID', 'AY-2026-S2'],
+    ['Academic year', '2026'],
+    ['Period', 'Semester 2'],
+    ['Start', '1 Aug 2026'],
+    ['End', '18 Dec 2026'],
+    ['Status', 'Active'],
+  ),
+  row(
+    ['Period ID', 'AY-2027-S1'],
+    ['Academic year', '2027'],
+    ['Period', 'Semester 1'],
+    ['Start', '11 Jan 2027'],
+    ['End', '25 Jun 2027'],
+    ['Status', 'Draft'],
+  ),
 ];
 const sessionRows = [
-  row(['Session','SES-001'],['Account','USR-004'],['Client','Desktop browser · Demo device'],['Started','20 Oct 2026 · 09:15'],['Status','Active']),
-  row(['Session','SES-002'],['Account','USR-003'],['Client','Desktop browser · Demo device'],['Started','20 Oct 2026 · 09:10'],['Status','Active']),
-  row(['Session','SEC-001'],['Account','USR-002'],['Client','Repeated sign-in failures'],['Started','19 Oct 2026 · 16:45'],['Status','Review needed']),
+  row(
+    ['Session', 'SES-001'],
+    ['Account', 'USR-004'],
+    ['Client', 'Desktop browser · Demo device'],
+    ['Started', '20 Oct 2026 · 09:15'],
+    ['Status', 'Active'],
+  ),
+  row(
+    ['Session', 'SES-002'],
+    ['Account', 'USR-003'],
+    ['Client', 'Desktop browser · Demo device'],
+    ['Started', '20 Oct 2026 · 09:10'],
+    ['Status', 'Active'],
+  ),
+  row(
+    ['Session', 'SEC-001'],
+    ['Account', 'USR-002'],
+    ['Client', 'Repeated sign-in failures'],
+    ['Started', '19 Oct 2026 · 16:45'],
+    ['Status', 'Review needed'],
+  ),
 ];
 const auditRows = [
-  row(['Time','20 Oct 2026 · 09:15'],['Actor','USR-004'],['Event','Administrator sign-in'],['Resource','Session service'],['Outcome','Recorded']),
-  row(['Time','19 Oct 2026 · 16:45'],['Actor','Authentication service'],['Event','Account lockout'],['Resource','USR-002'],['Outcome','Review needed']),
+  row(
+    ['Time', '20 Oct 2026 · 09:15'],
+    ['Actor', 'USR-004'],
+    ['Event', 'Administrator sign-in'],
+    ['Resource', 'Session service'],
+    ['Outcome', 'Recorded'],
+  ),
+  row(
+    ['Time', '19 Oct 2026 · 16:45'],
+    ['Actor', 'Authentication service'],
+    ['Event', 'Account lockout'],
+    ['Resource', 'USR-002'],
+    ['Outcome', 'Review needed'],
+  ),
 ];
 const integrationRows = [
-  row(['ID','INT-001'],['Integration','Institutional email'],['Owner','ICT / Administration'],['Requirement','Verified sender identity and approved provider'],['Status','Not connected']),
-  row(['ID','INT-002'],['Integration','Live classes'],['Owner','ICT / Academic office'],['Requirement','Approved conferencing provider and access controls'],['Status','Planned']),
-  row(['ID','INT-003'],['Integration','Payment gateway'],['Owner','Finance / ICT'],['Requirement','Settlement workflow and secure server-side credentials'],['Status','Not connected']),
+  row(
+    ['ID', 'INT-001'],
+    ['Integration', 'Institutional email'],
+    ['Owner', 'ICT / Administration'],
+    ['Requirement', 'Verified sender identity and approved provider'],
+    ['Status', 'Not connected'],
+  ),
+  row(
+    ['ID', 'INT-002'],
+    ['Integration', 'Live classes'],
+    ['Owner', 'ICT / Academic office'],
+    ['Requirement', 'Approved conferencing provider and access controls'],
+    ['Status', 'Planned'],
+  ),
+  row(
+    ['ID', 'INT-003'],
+    ['Integration', 'Payment gateway'],
+    ['Owner', 'Finance / ICT'],
+    ['Requirement', 'Settlement workflow and secure server-side credentials'],
+    ['Status', 'Not connected'],
+  ),
 ];
 const backupRows = [
-  row(['ID','BKP-001'],['Scope','Database'],['Last sample','20 Oct 2026 · 02:00'],['Verification','Sample integrity check recorded'],['Retention','30 days (proposal)'],['Status','Verified']),
-  row(['ID','BKP-002'],['Scope','Media files'],['Last sample','19 Oct 2026 · 03:00'],['Verification','Sample manifest review pending'],['Retention','30 days (proposal)'],['Status','Review needed']),
+  row(
+    ['ID', 'BKP-001'],
+    ['Scope', 'Database'],
+    ['Last sample', '20 Oct 2026 · 02:00'],
+    ['Verification', 'Sample integrity check recorded'],
+    ['Retention', '30 days (proposal)'],
+    ['Status', 'Verified'],
+  ),
+  row(
+    ['ID', 'BKP-002'],
+    ['Scope', 'Media files'],
+    ['Last sample', '19 Oct 2026 · 03:00'],
+    ['Verification', 'Sample manifest review pending'],
+    ['Retention', '30 days (proposal)'],
+    ['Status', 'Review needed'],
+  ),
 ];
 const settingsRows = [
-  row(['Setting','Institution'],['Value','Hope School of Ministry'],['Area','Identity'],['Status','Configured sample']),
-  row(['Setting','Timezone'],['Value','Africa/Blantyre'],['Area','Academic scheduling'],['Status','Configured sample']),
-  row(['Setting','Academic year'],['Value','2026'],['Area','Academic setup'],['Status','Configured sample']),
-  row(['Setting','Session duration'],['Value','30 minutes'],['Area','Security'],['Status','Proposal']),
-  row(['Setting','Upload limit'],['Value','500 MB'],['Area','Media'],['Status','Proposal']),
+  row(
+    ['Setting', 'Institution'],
+    ['Value', 'Hope School of Ministry'],
+    ['Area', 'Identity'],
+    ['Status', 'Configured sample'],
+  ),
+  row(
+    ['Setting', 'Timezone'],
+    ['Value', 'Africa/Blantyre'],
+    ['Area', 'Academic scheduling'],
+    ['Status', 'Configured sample'],
+  ),
+  row(
+    ['Setting', 'Academic year'],
+    ['Value', '2026'],
+    ['Area', 'Academic setup'],
+    ['Status', 'Configured sample'],
+  ),
+  row(
+    ['Setting', 'Session duration'],
+    ['Value', '30 minutes'],
+    ['Area', 'Security'],
+    ['Status', 'Proposal'],
+  ),
+  row(['Setting', 'Upload limit'], ['Value', '500 MB'], ['Area', 'Media'], ['Status', 'Proposal']),
 ];
 const certificateRows = [
-  row(['Certificate','CERT-2026-014'],['Student','Demo Student C'],['Programme','Certificate in Ministry'],['Completion','Ready for verification'],['Status','Review needed']),
-  row(['Certificate','CERT-2026-008'],['Student','Demo Student B'],['Programme','Certificate in Ministry'],['Completion','Awaiting final assessment'],['Status','In progress']),
+  row(
+    ['Certificate', 'CERT-2026-014'],
+    ['Student', 'Demo Student C'],
+    ['Programme', 'Certificate in Ministry'],
+    ['Completion', 'Ready for verification'],
+    ['Status', 'Review needed'],
+  ),
+  row(
+    ['Certificate', 'CERT-2026-008'],
+    ['Student', 'Demo Student B'],
+    ['Programme', 'Certificate in Ministry'],
+    ['Completion', 'Awaiting final assessment'],
+    ['Status', 'In progress'],
+  ),
 ];
 const financeDocs = [
-  row(['Reference','FIN-DOC-021'],['Document','Semester 2 fee schedule'],['Category','Fee schedule'],['Owner','Finance'],['Period','2026 · Semester 2'],['Status','Approved']),
-  row(['Reference','FIN-DOC-019'],['Document','Payment reconciliation notes'],['Category','Reconciliation'],['Owner','Finance'],['Period','October 2026'],['Status','Draft']),
-  row(['Reference','FIN-DOC-018'],['Document','Receipts register'],['Category','Receipt archive'],['Owner','Finance'],['Period','2026 · Semester 2'],['Status','Available']),
+  row(
+    ['Reference', 'FIN-DOC-021'],
+    ['Document', 'Semester 2 fee schedule'],
+    ['Category', 'Fee schedule'],
+    ['Owner', 'Finance'],
+    ['Period', '2026 · Semester 2'],
+    ['Status', 'Approved'],
+  ),
+  row(
+    ['Reference', 'FIN-DOC-019'],
+    ['Document', 'Payment reconciliation notes'],
+    ['Category', 'Reconciliation'],
+    ['Owner', 'Finance'],
+    ['Period', 'October 2026'],
+    ['Status', 'Draft'],
+  ),
+  row(
+    ['Reference', 'FIN-DOC-018'],
+    ['Document', 'Receipts register'],
+    ['Category', 'Receipt archive'],
+    ['Owner', 'Finance'],
+    ['Period', '2026 · Semester 2'],
+    ['Status', 'Available'],
+  ),
 ];
 const secretariatDocs = [
-  row(['Reference','SEC-DOC-021'],['Document','Admissions selection list'],['Category','Admissions'],['Owner','Secretariat'],['Period','2026 · Semester 2'],['Status','For review']),
-  row(['Reference','SEC-DOC-019'],['Document','Student registry extract'],['Category','Registry'],['Owner','Secretariat'],['Period','2026 · Semester 2'],['Status','Available']),
-  row(['Reference','SEC-DOC-017'],['Document','Enrolment cohort register'],['Category','Enrolment'],['Owner','Secretariat'],['Period','2026 · Semester 2'],['Status','Available']),
+  row(
+    ['Reference', 'SEC-DOC-021'],
+    ['Document', 'Admissions selection list'],
+    ['Category', 'Admissions'],
+    ['Owner', 'Secretariat'],
+    ['Period', '2026 · Semester 2'],
+    ['Status', 'For review'],
+  ),
+  row(
+    ['Reference', 'SEC-DOC-019'],
+    ['Document', 'Student registry extract'],
+    ['Category', 'Registry'],
+    ['Owner', 'Secretariat'],
+    ['Period', '2026 · Semester 2'],
+    ['Status', 'Available'],
+  ),
+  row(
+    ['Reference', 'SEC-DOC-017'],
+    ['Document', 'Enrolment cohort register'],
+    ['Category', 'Enrolment'],
+    ['Owner', 'Secretariat'],
+    ['Period', '2026 · Semester 2'],
+    ['Status', 'Available'],
+  ),
 ];
 const operationalEvents = [
-  row(['Event','Academic planning meeting'],['Date','19 Nov 2026'],['Owner','Administration'],['Audience','Staff'],['Status','Scheduled']),
-  row(['Event','Student orientation'],['Date','25 Nov 2026'],['Owner','Secretariat'],['Audience','New students'],['Status','Planned']),
-  row(['Event','Semester close briefing'],['Date','12 Dec 2026'],['Owner','Head of HOSOM'],['Audience','All staff'],['Status','Draft']),
+  row(
+    ['Event', 'Academic planning meeting'],
+    ['Date', '19 Nov 2026'],
+    ['Owner', 'Administration'],
+    ['Audience', 'Staff'],
+    ['Status', 'Scheduled'],
+  ),
+  row(
+    ['Event', 'Student orientation'],
+    ['Date', '25 Nov 2026'],
+    ['Owner', 'Secretariat'],
+    ['Audience', 'New students'],
+    ['Status', 'Planned'],
+  ),
+  row(
+    ['Event', 'Semester close briefing'],
+    ['Date', '12 Dec 2026'],
+    ['Owner', 'Head of HOSOM'],
+    ['Audience', 'All staff'],
+    ['Status', 'Draft'],
+  ),
 ];
 
 export function managementSpec(role: RoleSlug, section: string, state: WorkflowState): ContentSpec {
-  const activeCandidates = state.candidates.map(c => row(['Reference',c.id],['Name',c.name],['Programme',c.programme],['Cohort',c.cohort ?? '—'],['Status',c.status]));
-  const enrolledCount = state.candidates.filter(c => c.status === 'Enrolled').length;
-  const confirmed = state.payments.filter(p => p.status === 'Confirmed');
+  const activeCandidates = state.candidates.map((c) =>
+    row(
+      ['Reference', c.id],
+      ['Name', c.name],
+      ['Programme', c.programme],
+      ['Cohort', c.cohort ?? '—'],
+      ['Status', c.status],
+    ),
+  );
+  const enrolledCount = state.candidates.filter((c) => c.status === 'Enrolled').length;
+  const confirmed = state.payments.filter((p) => p.status === 'Confirmed');
   const collected = confirmed.reduce((sum, p) => sum + p.amount, 0);
-  const financialRows = state.payments.map(p => row(['Reference',p.id],['Student',p.student],['Method',p.method],['Amount',`MWK ${p.amount.toLocaleString('en-GB')}`],['Status',p.status]));
-  const resourceRows = [...mediaRows, ...state.resources.map(r => row(['Reference',r.id],['Resource',r.title],['Course',r.course],['Type',r.type],['Scope','Course audience'],['Size','Link / lesson'],['Status',r.status]))];
-  const resultRows = state.submissions.map(s => row(['Reference',s.id],['Student',s.student],['Assessment',state.assessments.find(a => a.id === s.assessmentId)?.title ?? s.assessmentId],['Mark',s.mark == null ? 'Awaiting mark' : `${s.mark}%`],['Status',s.status]));
-  const fullProgrammeCards = programmes.map(p => ({ title: p.name, detail: p.description, meta: `${p.type} · ${p.duration} · ${p.code}` }));
+  const financialRows = state.payments.map((p) =>
+    row(
+      ['Reference', p.id],
+      ['Student', p.student],
+      ['Method', p.method],
+      ['Amount', `MWK ${p.amount.toLocaleString('en-GB')}`],
+      ['Status', p.status],
+    ),
+  );
+  const resourceRows = [
+    ...mediaRows,
+    ...state.resources.map((r) =>
+      row(
+        ['Reference', r.id],
+        ['Resource', r.title],
+        ['Course', r.course],
+        ['Type', r.type],
+        ['Scope', 'Course audience'],
+        ['Size', 'Link / lesson'],
+        ['Status', r.status],
+      ),
+    ),
+  ];
+  const resultRows = state.submissions.map((s) =>
+    row(
+      ['Reference', s.id],
+      ['Student', s.student],
+      [
+        'Assessment',
+        state.assessments.find((a) => a.id === s.assessmentId)?.title ?? s.assessmentId,
+      ],
+      ['Mark', s.mark == null ? 'Awaiting mark' : `${s.mark}%`],
+      ['Status', s.status],
+    ),
+  );
+  const fullProgrammeCards = programmes.map((p) => ({
+    title: p.name,
+    detail: p.description,
+    meta: `${p.type} · ${p.duration} · ${p.code}`,
+  }));
   const academicCards = [
-    { title: 'Course allocation', detail: 'Courses follow active programme offerings and assigned lecturers.', meta: 'System Administrator → Head of Programs → Lecturer' },
-    { title: 'Assessment review', detail: 'Marked work is reviewed academically before Secretariat publication.', meta: 'Lecturer → Head of Programs → Secretariat' },
-    { title: 'Enrolment visibility', detail: 'Course access follows approved academic periods and student cohorts.', meta: 'Academic catalogue and registry' },
+    {
+      title: 'Course allocation',
+      detail: 'Courses follow active programme offerings and assigned lecturers.',
+      meta: 'System Administrator → Head of Programs → Lecturer',
+    },
+    {
+      title: 'Assessment review',
+      detail: 'Marked work is reviewed academically before Secretariat publication.',
+      meta: 'Lecturer → Head of Programs → Secretariat',
+    },
+    {
+      title: 'Enrolment visibility',
+      detail: 'Course access follows approved academic periods and student cohorts.',
+      meta: 'Academic catalogue and registry',
+    },
   ];
   if (role === 'secretariat') {
-    if (section === 'Manage Students') return page('STUDENT REGISTRY','Manage Students','View verified student records, programme placement and academic cohort membership.',activeCandidates,[metric('Candidate records',state.candidates.length,'Current demo intake'),metric('Enrolled students',enrolledCount,'Placed in a cohort'),metric('Programmes',3,'Sample academic pathways')],[{ title: 'Identity & records', detail: 'Student details and supporting documents are reviewed by Secretariat before publication.' },{ title: 'Cohort placement', detail: 'Returning students keep their identity while each new semester receives a separate enrolment record.' }],{tableTitle:'Student and candidate register',variant:'directory'});
-    if (section === 'Documents') return page('SECRETARIAT ARCHIVE','Documents','Manage admissions lists, student registry extracts and enrolment records.',secretariatDocs,[metric('Document categories',3,'Admissions, registry, enrolment'),metric('Current period','2026 S2','Semester register'),metric('Records to review',1,'Selection list')],[{ title: 'Admissions lists', detail: 'Selections, admissions and approvals remain traceable through the academic handoff.' },{ title: 'Student archive', detail: 'Verified student and enrolment records are grouped by academic period.' }],{tableTitle:'Secretariat document register'});
-    if (section === 'Reports') return page('STUDENT ADMINISTRATION','Secretariat Reports','Review application, admission, enrolment and student record activity.',reportRows.filter(r => ['Secretariat','Academics'].includes(r.Area)),[metric('Applications',state.candidates.length,'Current demo intake'),metric('Published admissions',state.candidates.filter(c => ['Published','Enrolled'].includes(c.status)).length,'Ready for enrolment or enrolled'),metric('Enrolled',enrolledCount,'Current demo cohort')],[{ title: 'Admissions pipeline', detail: 'Submitted → selected → admitted → academic approval → published → enrolled.' },{ title: 'Registry quality', detail: 'Review duplicate identities, required documents and programme placement.' }],{tableTitle:'Available Secretariat reports',variant:'analytics'});
+    if (section === 'Manage Students')
+      return page(
+        'STUDENT REGISTRY',
+        'Manage Students',
+        'View verified student records, programme placement and academic cohort membership.',
+        activeCandidates,
+        [
+          metric('Candidate records', state.candidates.length, 'Current demo intake'),
+          metric('Enrolled students', enrolledCount, 'Placed in a cohort'),
+          metric('Programmes', 3, 'Sample academic pathways'),
+        ],
+        [
+          {
+            title: 'Identity & records',
+            detail:
+              'Student details and supporting documents are reviewed by Secretariat before publication.',
+          },
+          {
+            title: 'Cohort placement',
+            detail:
+              'Returning students keep their identity while each new semester receives a separate enrolment record.',
+          },
+        ],
+        { tableTitle: 'Student and candidate register', variant: 'directory' },
+      );
+    if (section === 'Documents')
+      return page(
+        'SECRETARIAT ARCHIVE',
+        'Documents',
+        'Manage admissions lists, student registry extracts and enrolment records.',
+        secretariatDocs,
+        [
+          metric('Document categories', 3, 'Admissions, registry, enrolment'),
+          metric('Current period', '2026 S2', 'Semester register'),
+          metric('Records to review', 1, 'Selection list'),
+        ],
+        [
+          {
+            title: 'Admissions lists',
+            detail:
+              'Selections, admissions and approvals remain traceable through the academic handoff.',
+          },
+          {
+            title: 'Student archive',
+            detail: 'Verified student and enrolment records are grouped by academic period.',
+          },
+        ],
+        { tableTitle: 'Secretariat document register' },
+      );
+    if (section === 'Reports')
+      return page(
+        'STUDENT ADMINISTRATION',
+        'Secretariat Reports',
+        'Review application, admission, enrolment and student record activity.',
+        reportRows.filter((r) => ['Secretariat', 'Academics'].includes(r.Area)),
+        [
+          metric('Applications', state.candidates.length, 'Current demo intake'),
+          metric(
+            'Published admissions',
+            state.candidates.filter((c) => ['Published', 'Enrolled'].includes(c.status)).length,
+            'Ready for enrolment or enrolled',
+          ),
+          metric('Enrolled', enrolledCount, 'Current demo cohort'),
+        ],
+        [
+          {
+            title: 'Admissions pipeline',
+            detail: 'Submitted → selected → admitted → academic approval → published → enrolled.',
+          },
+          {
+            title: 'Registry quality',
+            detail: 'Review duplicate identities, required documents and programme placement.',
+          },
+        ],
+        { tableTitle: 'Available Secretariat reports', variant: 'analytics' },
+      );
   }
   if (role === 'finance') {
-    if (section === 'Reports') return page('FINANCIAL INSIGHTS','Finance Reports','Review fee collection, outstanding balances and payment activity by period.',financialRows.length ? financialRows : financeDocs,[metric('Payments received',state.payments.length,'Staged in this session'),metric('Confirmed',confirmed.length,'Finance verified'),metric('Collected',`MWK ${collected.toLocaleString('en-GB')}`,'Confirmed demo amount')],[{ title: 'Collection summary', detail: 'Compare expected charges with confirmed receipts and open balances.' },{ title: 'Reconciliation', detail: 'Pending student payments appear in Finance until confirmed.' }],{tableTitle:financialRows.length ? 'Payment detail' : 'Available Finance reports',variant:'analytics'});
-    if (section === 'Documents') return page('FINANCE ARCHIVE','Finance Documents','Fee schedules, payment reconciliations and receipt archives.',financeDocs,[metric('Document types',3,'Schedules, registers, reconciliation'),metric('Current period','2026 S2','Academic fee cycle'),metric('For review',1,'Reconciliation notes')],[{ title: 'Fee schedules', detail: 'Expected charges remain separate from confirmed payment transactions.' },{ title: 'Receipt history', detail: 'Issued receipts should be traceable to the student and academic period.' }],{tableTitle:'Finance document register'});
+    if (section === 'Reports')
+      return page(
+        'FINANCIAL INSIGHTS',
+        'Finance Reports',
+        'Review fee collection, outstanding balances and payment activity by period.',
+        financialRows.length ? financialRows : financeDocs,
+        [
+          metric('Payments received', state.payments.length, 'Staged in this session'),
+          metric('Confirmed', confirmed.length, 'Finance verified'),
+          metric('Collected', `MWK ${collected.toLocaleString('en-GB')}`, 'Confirmed demo amount'),
+        ],
+        [
+          {
+            title: 'Collection summary',
+            detail: 'Compare expected charges with confirmed receipts and open balances.',
+          },
+          {
+            title: 'Reconciliation',
+            detail: 'Pending student payments appear in Finance until confirmed.',
+          },
+        ],
+        {
+          tableTitle: financialRows.length ? 'Payment detail' : 'Available Finance reports',
+          variant: 'analytics',
+        },
+      );
+    if (section === 'Documents')
+      return page(
+        'FINANCE ARCHIVE',
+        'Finance Documents',
+        'Fee schedules, payment reconciliations and receipt archives.',
+        financeDocs,
+        [
+          metric('Document types', 3, 'Schedules, registers, reconciliation'),
+          metric('Current period', '2026 S2', 'Academic fee cycle'),
+          metric('For review', 1, 'Reconciliation notes'),
+        ],
+        [
+          {
+            title: 'Fee schedules',
+            detail: 'Expected charges remain separate from confirmed payment transactions.',
+          },
+          {
+            title: 'Receipt history',
+            detail: 'Issued receipts should be traceable to the student and academic period.',
+          },
+        ],
+        { tableTitle: 'Finance document register' },
+      );
   }
   if (role === 'administration') {
-    if (section === 'Staff Management') return page('PEOPLE & DEPARTMENTS','Staff Information','Authorized staff details, departmental assignments and institutional responsibilities.',staff,[metric('Total staff',staff.length,'Directory profiles'),metric('Active staff',staff.filter(r => r.Status === 'Active').length,'Currently active'),metric('Departments',4,'Administration, Academics, Finance, Media')],[{ title: 'Staff profiles', detail: 'Official designation, department, contact information and institutional responsibility.' },{ title: 'Access boundary', detail: 'ICT account control, payroll and lecturer allocation belong to their responsible modules.' }],{tableTitle:'Staff directory',variant:'directory'});
-    if (section === 'Records') return page('RECORD FIRST · DISCUSS · TAKE ACTION','Administrative Records','Start a record, discuss it with your team, then keep it as a document or send it for review.',adminRecords,[metric('Total records',adminRecords.length,'In this sample register'),metric('Needs action',adminRecords.filter(r => r.Status === 'Needs action').length,'Keep or send for review'),metric('In review',adminRecords.filter(r => r.Status === 'For review').length,'Head of Programs or Director')],[{ title: 'Record discussion', detail: 'Each record carries a description, owner, category and team discussion.' },{ title: 'Approval route', detail: 'Administration → Head of Programs review → Director / Chancellor approval.' }],{tableTitle:'Records and actions'});
-    if (section === 'Documents') return page('INSTITUTIONAL ARCHIVE','Administration Documents','Kept records, approved circulars and operational documents are indexed here.',adminDocs,[metric('Documents',adminDocs.length,'Indexed sample files'),metric('Approved',adminDocs.filter(r => r.Status === 'Approved').length,'Ready to reference'),metric('Drafts',adminDocs.filter(r => r.Status === 'Draft').length,'In preparation')],[{ title: 'Document register', detail: 'Category, owner, version and approval state remain visible.' },{ title: 'From records', detail: 'Kept administrative records form a document entry with source context.' }],{tableTitle:'Document register'});
-    if (section === 'Approvals') return page('STAGED APPROVALS','Approval Requests','Follow institutional records from administrative review to executive approval.',adminRecords,[metric('Awaiting review',1,'Head of Programs'),metric('Awaiting approval',1,'Director / Chancellor'),metric('Returned',0,'For correction')],[{ title: 'Review path', detail: 'The Head of Programs reviews administrative records before the Director makes a final decision.' },{ title: 'Returned requests', detail: 'Returned records remain with the initiating office for revision and resubmission.' }],{tableTitle:'Review queue'});
-    if (section === 'Reports') return page('INSTITUTIONAL OPERATIONS','Administration Reports','Track staff, records, documents, approvals and operational activity.',reportRows,[metric('Staff profiles',staff.length,'Institutional directory'),metric('Open records',adminRecords.length,'Action and review'),metric('Documents',adminDocs.length,'Indexed sample')],[{ title: 'Staff distribution', detail: 'Department-level directory counts without confidential payroll details.' },{ title: 'Record outcomes', detail: 'Follow kept documents, review requests and approval decisions.' }],{tableTitle:'Available reports',variant:'analytics'});
+    if (section === 'Staff Management')
+      return page(
+        'PEOPLE & DEPARTMENTS',
+        'Staff Information',
+        'Authorized staff details, departmental assignments and institutional responsibilities.',
+        staff,
+        [
+          metric('Total staff', staff.length, 'Directory profiles'),
+          metric(
+            'Active staff',
+            staff.filter((r) => r.Status === 'Active').length,
+            'Currently active',
+          ),
+          metric('Departments', 4, 'Administration, Academics, Finance, Media'),
+        ],
+        [
+          {
+            title: 'Staff profiles',
+            detail:
+              'Official designation, department, contact information and institutional responsibility.',
+          },
+          {
+            title: 'Access boundary',
+            detail:
+              'ICT account control, payroll and lecturer allocation belong to their responsible modules.',
+          },
+        ],
+        { tableTitle: 'Staff directory', variant: 'directory' },
+      );
+    if (section === 'Records')
+      return page(
+        'RECORD FIRST · DISCUSS · TAKE ACTION',
+        'Administrative Records',
+        'Start a record, discuss it with your team, then keep it as a document or send it for review.',
+        adminRecords,
+        [
+          metric('Total records', adminRecords.length, 'In this sample register'),
+          metric(
+            'Needs action',
+            adminRecords.filter((r) => r.Status === 'Needs action').length,
+            'Keep or send for review',
+          ),
+          metric(
+            'In review',
+            adminRecords.filter((r) => r.Status === 'For review').length,
+            'Head of Programs or Director',
+          ),
+        ],
+        [
+          {
+            title: 'Record discussion',
+            detail: 'Each record carries a description, owner, category and team discussion.',
+          },
+          {
+            title: 'Approval route',
+            detail: 'Administration → Head of Programs review → Director / Chancellor approval.',
+          },
+        ],
+        { tableTitle: 'Records and actions' },
+      );
+    if (section === 'Documents')
+      return page(
+        'INSTITUTIONAL ARCHIVE',
+        'Administration Documents',
+        'Kept records, approved circulars and operational documents are indexed here.',
+        adminDocs,
+        [
+          metric('Documents', adminDocs.length, 'Indexed sample files'),
+          metric(
+            'Approved',
+            adminDocs.filter((r) => r.Status === 'Approved').length,
+            'Ready to reference',
+          ),
+          metric('Drafts', adminDocs.filter((r) => r.Status === 'Draft').length, 'In preparation'),
+        ],
+        [
+          {
+            title: 'Document register',
+            detail: 'Category, owner, version and approval state remain visible.',
+          },
+          {
+            title: 'From records',
+            detail: 'Kept administrative records form a document entry with source context.',
+          },
+        ],
+        { tableTitle: 'Document register' },
+      );
+    if (section === 'Approvals')
+      return page(
+        'STAGED APPROVALS',
+        'Approval Requests',
+        'Follow institutional records from administrative review to executive approval.',
+        adminRecords,
+        [
+          metric('Awaiting review', 1, 'Head of Programs'),
+          metric('Awaiting approval', 1, 'Director / Chancellor'),
+          metric('Returned', 0, 'For correction'),
+        ],
+        [
+          {
+            title: 'Review path',
+            detail:
+              'The Head of Programs reviews administrative records before the Director makes a final decision.',
+          },
+          {
+            title: 'Returned requests',
+            detail:
+              'Returned records remain with the initiating office for revision and resubmission.',
+          },
+        ],
+        { tableTitle: 'Review queue' },
+      );
+    if (section === 'Reports')
+      return page(
+        'INSTITUTIONAL OPERATIONS',
+        'Administration Reports',
+        'Track staff, records, documents, approvals and operational activity.',
+        reportRows,
+        [
+          metric('Staff profiles', staff.length, 'Institutional directory'),
+          metric('Open records', adminRecords.length, 'Action and review'),
+          metric('Documents', adminDocs.length, 'Indexed sample'),
+        ],
+        [
+          {
+            title: 'Staff distribution',
+            detail: 'Department-level directory counts without confidential payroll details.',
+          },
+          {
+            title: 'Record outcomes',
+            detail: 'Follow kept documents, review requests and approval decisions.',
+          },
+        ],
+        { tableTitle: 'Available reports', variant: 'analytics' },
+      );
   }
   if (role === 'head-of-programs') {
-    if (section === 'Programmes') return page('ACADEMIC CATALOGUE','Programmes','Maintain programme pathways and the courses that belong to each academic level.',programmeRows,[metric('Active programmes',2,'Certificate and diploma'),metric('Planned programme',1,'Bachelor of Ministry'),metric('Course offerings',3,'Visible demo courses')],fullProgrammeCards,{tableTitle:'Programme catalogue',variant:'library'});
-    if (section === 'Courses') return page('ACADEMIC CATALOGUE','Course Offerings','Review courses, assigned lecturers, enrolment and active delivery status.',academicRows,[metric('Course offerings',academicRows.length,'Current demo catalogue'),metric('Assigned lecturers',2,'Teaching these courses'),metric('Students across courses',111,'Illustrative enrolments')],academicCards,{tableTitle:'Course allocation',variant:'library'});
-    if (section === 'Lecturers') return page('ACADEMIC ALLOCATION','Lecturer Assignments','Review faculty specialisations and active course allocations.',lecturerRows,[metric('Lecturers',2,'Current sample'),metric('Allocated courses',3,'Active teaching'),metric('Unassigned courses',0,'From current demo catalogue')],[{ title: 'Dr. Daniel Phiri', detail: 'Theology and biblical studies. Assigned to Biblical Interpretation and Foundations of Theology.', meta: 'BI101 · TH201' },{ title: 'Rev. Esther Banda', detail: 'Ministry and leadership. Assigned to Ministry Leadership.', meta: 'MN202' }],{tableTitle:'Lecturer directory',variant:'directory'});
-    if (section === 'Enrolment Monitoring') return page('ACADEMIC PERIOD','Enrolment Monitoring','Track the student journey from approved admission into current cohorts and course offerings.',activeCandidates,[metric('Enrolled',enrolledCount,'In demo cohort'),metric('Published admissions',state.candidates.filter(c => c.status === 'Published').length,'Awaiting cohort placement'),metric('Active courses',academicRows.length,'Open for delivery')],[{ title: 'Cohort scope', detail: 'An academic year and semester define each enrolment record.' },{ title: 'Course access', detail: 'Enrolled students receive access to active offerings in their programme.' }],{tableTitle:'Programme placement'});
-    if (section === 'Assessment Monitoring') return page('ACADEMIC QUALITY','Assessment Monitoring','Follow published activities and the marking pipeline across current courses.',resultRows.length ? resultRows : state.assessments.map(a => row(['Reference',a.id],['Student','Awaiting submissions'],['Assessment',a.title],['Mark','—'],['Status',a.status])),[metric('Assessments',state.assessments.length,'Across courses'),metric('Submissions',state.submissions.length,'Student activity'),metric('Marked',state.submissions.filter(s => s.mark != null).length,'Ready for review')],[{ title: 'Assessment coverage', detail: 'Assignments, quizzes and approved written exams are tracked by course.' },{ title: 'Results route', detail: 'Lecturer marking → Head of Programs review → Secretariat publication.' }],{tableTitle:'Assessment activity',variant:'analytics'});
-    if (section === 'Academic Progress') return page('STUDENT OUTCOMES','Academic Progress','Review completion, outstanding courses and assessment outcomes before graduation decisions.',resultRows.length ? resultRows : [row(['Reference','DEMO-014'],['Student','Demo Student A'],['Assessment','TH-101, BI-103'],['Mark','48% average'],['Status','At risk']),row(['Reference','DEMO-021'],['Student','Demo Student B'],['Assessment','MN-102'],['Mark','66% average'],['Status','Incomplete']),row(['Reference','DEMO-033'],['Student','Demo Student C'],['Assessment','Completed'],['Mark','82% average'],['Status','Ready for verification'])],[metric('Completion ready',1,'Sample student'),metric('Needs support',2,'Incomplete or failed course'),metric('Marked in session',state.submissions.filter(s => s.mark != null).length,'Current demo activity')],[{ title: 'Completion checks', detail: 'Require all prescribed courses and released results before completion verification.' },{ title: 'At risk signals', detail: 'Failed or incomplete assessments remain visible for academic follow-up.' }],{tableTitle:'Student progress register',variant:'analytics'});
-    if (section === 'Approvals') return page('ACADEMIC REVIEW','Approval Requests','Administrative records and academic decisions awaiting programme office review.',adminRecords,[metric('Record reviews',1,'Administrative route'),metric('Exam requests',state.assessments.filter(a => a.status === 'Awaiting approval').length,'Ready to assess'),metric('Result batches',state.submissions.filter(s => s.status === 'Marked').length,'Ready to review')],[{ title: 'Exam approval', detail: 'Written exams are approved before lecturers can schedule them.' },{ title: 'Result review', detail: 'Marked results require an academic decision before publication.' }],{tableTitle:'Approval queue'});
-    if (section === 'Reports') return page('ACADEMIC REPORTING','Programme Reports','Review programme setup, course allocation, enrolment and student outcomes.',reportRows.filter(r => r.Area === 'Academics'),[metric('Programmes',programmeRows.length,'Catalogue entries'),metric('Courses',academicRows.length,'Current offerings'),metric('Enrolled demo candidates',enrolledCount,'Current session')],academicCards,{tableTitle:'Academic reports',variant:'analytics'});
+    if (section === 'Programmes')
+      return page(
+        'ACADEMIC CATALOGUE',
+        'Programmes',
+        'Maintain programme pathways and the courses that belong to each academic level.',
+        programmeRows,
+        [
+          metric('Active programmes', 2, 'Certificate and diploma'),
+          metric('Planned programme', 1, 'Bachelor of Ministry'),
+          metric('Course offerings', 3, 'Visible demo courses'),
+        ],
+        fullProgrammeCards,
+        { tableTitle: 'Programme catalogue', variant: 'library' },
+      );
+    if (section === 'Courses')
+      return page(
+        'ACADEMIC CATALOGUE',
+        'Course Offerings',
+        'Review courses, assigned lecturers, enrolment and active delivery status.',
+        academicRows,
+        [
+          metric('Course offerings', academicRows.length, 'Current demo catalogue'),
+          metric('Assigned lecturers', 2, 'Teaching these courses'),
+          metric('Students across courses', 111, 'Illustrative enrolments'),
+        ],
+        academicCards,
+        { tableTitle: 'Course allocation', variant: 'library' },
+      );
+    if (section === 'Lecturers')
+      return page(
+        'ACADEMIC ALLOCATION',
+        'Lecturer Assignments',
+        'Review faculty specialisations and active course allocations.',
+        lecturerRows,
+        [
+          metric('Lecturers', 2, 'Current sample'),
+          metric('Allocated courses', 3, 'Active teaching'),
+          metric('Unassigned courses', 0, 'From current demo catalogue'),
+        ],
+        [
+          {
+            title: 'Dr. Daniel Phiri',
+            detail:
+              'Theology and biblical studies. Assigned to Biblical Interpretation and Foundations of Theology.',
+            meta: 'BI101 · TH201',
+          },
+          {
+            title: 'Rev. Esther Banda',
+            detail: 'Ministry and leadership. Assigned to Ministry Leadership.',
+            meta: 'MN202',
+          },
+        ],
+        { tableTitle: 'Lecturer directory', variant: 'directory' },
+      );
+    if (section === 'Enrolment Monitoring')
+      return page(
+        'ACADEMIC PERIOD',
+        'Enrolment Monitoring',
+        'Track the student journey from approved admission into current cohorts and course offerings.',
+        activeCandidates,
+        [
+          metric('Enrolled', enrolledCount, 'In demo cohort'),
+          metric(
+            'Published admissions',
+            state.candidates.filter((c) => c.status === 'Published').length,
+            'Awaiting cohort placement',
+          ),
+          metric('Active courses', academicRows.length, 'Open for delivery'),
+        ],
+        [
+          {
+            title: 'Cohort scope',
+            detail: 'An academic year and semester define each enrolment record.',
+          },
+          {
+            title: 'Course access',
+            detail: 'Enrolled students receive access to active offerings in their programme.',
+          },
+        ],
+        { tableTitle: 'Programme placement' },
+      );
+    if (section === 'Assessment Monitoring')
+      return page(
+        'ACADEMIC QUALITY',
+        'Assessment Monitoring',
+        'Follow published activities and the marking pipeline across current courses.',
+        resultRows.length
+          ? resultRows
+          : state.assessments.map((a) =>
+              row(
+                ['Reference', a.id],
+                ['Student', 'Awaiting submissions'],
+                ['Assessment', a.title],
+                ['Mark', '—'],
+                ['Status', a.status],
+              ),
+            ),
+        [
+          metric('Assessments', state.assessments.length, 'Across courses'),
+          metric('Submissions', state.submissions.length, 'Student activity'),
+          metric(
+            'Marked',
+            state.submissions.filter((s) => s.mark != null).length,
+            'Ready for review',
+          ),
+        ],
+        [
+          {
+            title: 'Assessment coverage',
+            detail: 'Assignments, quizzes and approved written exams are tracked by course.',
+          },
+          {
+            title: 'Results route',
+            detail: 'Lecturer marking → Head of Programs review → Secretariat publication.',
+          },
+        ],
+        { tableTitle: 'Assessment activity', variant: 'analytics' },
+      );
+    if (section === 'Academic Progress')
+      return page(
+        'STUDENT OUTCOMES',
+        'Academic Progress',
+        'Review completion, outstanding courses and assessment outcomes before graduation decisions.',
+        resultRows.length
+          ? resultRows
+          : [
+              row(
+                ['Reference', 'DEMO-014'],
+                ['Student', 'Demo Student A'],
+                ['Assessment', 'TH-101, BI-103'],
+                ['Mark', '48% average'],
+                ['Status', 'At risk'],
+              ),
+              row(
+                ['Reference', 'DEMO-021'],
+                ['Student', 'Demo Student B'],
+                ['Assessment', 'MN-102'],
+                ['Mark', '66% average'],
+                ['Status', 'Incomplete'],
+              ),
+              row(
+                ['Reference', 'DEMO-033'],
+                ['Student', 'Demo Student C'],
+                ['Assessment', 'Completed'],
+                ['Mark', '82% average'],
+                ['Status', 'Ready for verification'],
+              ),
+            ],
+        [
+          metric('Completion ready', 1, 'Sample student'),
+          metric('Needs support', 2, 'Incomplete or failed course'),
+          metric(
+            'Marked in session',
+            state.submissions.filter((s) => s.mark != null).length,
+            'Current demo activity',
+          ),
+        ],
+        [
+          {
+            title: 'Completion checks',
+            detail:
+              'Require all prescribed courses and released results before completion verification.',
+          },
+          {
+            title: 'At risk signals',
+            detail: 'Failed or incomplete assessments remain visible for academic follow-up.',
+          },
+        ],
+        { tableTitle: 'Student progress register', variant: 'analytics' },
+      );
+    if (section === 'Approvals')
+      return page(
+        'ACADEMIC REVIEW',
+        'Approval Requests',
+        'Administrative records and academic decisions awaiting programme office review.',
+        adminRecords,
+        [
+          metric('Record reviews', 1, 'Administrative route'),
+          metric(
+            'Exam requests',
+            state.assessments.filter((a) => a.status === 'Awaiting approval').length,
+            'Ready to assess',
+          ),
+          metric(
+            'Result batches',
+            state.submissions.filter((s) => s.status === 'Marked').length,
+            'Ready to review',
+          ),
+        ],
+        [
+          {
+            title: 'Exam approval',
+            detail: 'Written exams are approved before lecturers can schedule them.',
+          },
+          {
+            title: 'Result review',
+            detail: 'Marked results require an academic decision before publication.',
+          },
+        ],
+        { tableTitle: 'Approval queue' },
+      );
+    if (section === 'Reports')
+      return page(
+        'ACADEMIC REPORTING',
+        'Programme Reports',
+        'Review programme setup, course allocation, enrolment and student outcomes.',
+        reportRows.filter((r) => r.Area === 'Academics'),
+        [
+          metric('Programmes', programmeRows.length, 'Catalogue entries'),
+          metric('Courses', academicRows.length, 'Current offerings'),
+          metric('Enrolled demo candidates', enrolledCount, 'Current session'),
+        ],
+        academicCards,
+        { tableTitle: 'Academic reports', variant: 'analytics' },
+      );
   }
   if (role === 'head-of-hosom') {
-    if (section === 'Reports') return page('SCHOOL LEADERSHIP','Institutional Reports','Review academic, admissions and finance summaries for school leadership.',reportRows,[metric('Programme pathways',programmeRows.length,'Sample catalogue'),metric('Admissions records',state.candidates.length,'Current demo intake'),metric('Requisitions',state.requisitions.length,'In review pipeline')],[{ title: 'Academic snapshot', detail: 'Programme delivery, course allocation and result status.' },{ title: 'Admissions snapshot', detail: 'Selection, approval, publication and enrolment stages.' },{ title: 'Finance snapshot', detail: 'Collection and balances shown as illustrative aggregates.' }],{tableTitle:'Available institutional reports',variant:'analytics'});
+    if (section === 'Reports')
+      return page(
+        'SCHOOL LEADERSHIP',
+        'Institutional Reports',
+        'Review academic, admissions and finance summaries for school leadership.',
+        reportRows,
+        [
+          metric('Programme pathways', programmeRows.length, 'Sample catalogue'),
+          metric('Admissions records', state.candidates.length, 'Current demo intake'),
+          metric('Requisitions', state.requisitions.length, 'In review pipeline'),
+        ],
+        [
+          {
+            title: 'Academic snapshot',
+            detail: 'Programme delivery, course allocation and result status.',
+          },
+          {
+            title: 'Admissions snapshot',
+            detail: 'Selection, approval, publication and enrolment stages.',
+          },
+          {
+            title: 'Finance snapshot',
+            detail: 'Collection and balances shown as illustrative aggregates.',
+          },
+        ],
+        { tableTitle: 'Available institutional reports', variant: 'analytics' },
+      );
   }
   if (role === 'director') {
-    if (section === 'Approvals') return page('EXECUTIVE DECISIONS','Approval Queue','Review forwarded requisitions and administrative records requiring a final decision.',state.requisitions.map(r => row(['Reference',r.id],['Item',r.title],['Owner',r.requester],['Value',`MWK ${r.amount.toLocaleString('en-GB')}`],['Status',r.status])),[metric('Forwarded',state.requisitions.filter(r => r.status === 'Forwarded').length,'Awaiting Director'),metric('Approved',state.requisitions.filter(r => r.status === 'Approved').length,'Ready for Finance'),metric('Records for review',1,'Administrative route')],[{ title: 'Decision trail', detail: 'Forwarded requests receive a final approval or are returned with reasons.' },{ title: 'Finance handoff', detail: 'Approved requisitions move to Finance for payment initiation.' }],{tableTitle:'Executive decision register'});
-    if (section === 'Academic Performance') return page('ACADEMIC OVERSIGHT','Academic Performance','Compare programme activity, student volume and pass rates across academic periods.',[row(['Programme','Certificate in Ministry'],['Students','28'],['Pass rate','86%'],['Courses','4'],['Period','2026 · Semester 2'],['Status','Active']),row(['Programme','Diploma in Theology'],['Students','36'],['Pass rate','78%'],['Courses','6'],['Period','2026 · Semester 2'],['Status','Active']),row(['Programme','Bachelor of Ministry'],['Students','18'],['Pass rate','81%'],['Courses','8'],['Period','2026 · Semester 2'],['Status','Active'])],[metric('Current active students',82,'Illustrative 2026 S2 period'),metric('Weighted pass rate','81%','Programme sample'),metric('Programmes',3,'Academic pathways')],[{ title: 'Performance trends', detail: 'Compare the latest period with previous semesters before making programme decisions.' },{ title: 'Completion readiness', detail: 'Student completion requires verified academic records.' }],{tableTitle:'Programme performance',variant:'analytics'});
-    if (section === 'Finance Summary') return page('EXECUTIVE FINANCE','Finance Summary','Review collected amounts and outstanding balances by programme and academic period.',[row(['Programme','Certificate in Ministry'],['Collected','MWK 1,260,000'],['Outstanding','MWK 420,000'],['Period','2026 · Semester 2'],['Status','Current']),row(['Programme','Diploma in Theology'],['Collected','MWK 2,520,000'],['Outstanding','MWK 630,000'],['Period','2026 · Semester 2'],['Status','Current']),row(['Programme','Bachelor of Ministry'],['Collected','MWK 2,040,000'],['Outstanding','MWK 510,000'],['Period','2026 · Semester 2'],['Status','Current'])],[metric('Collected','MWK 5.82m','Illustrative period total'),metric('Outstanding','MWK 1.56m','Closing balances'),metric('Confirmed this session',`MWK ${collected.toLocaleString('en-GB')}`,'Demo payment flow')],[{ title: 'Collection coverage', detail: 'Collections are activity totals for the selected period.' },{ title: 'Closing balances', detail: 'Outstanding amounts represent closing positions and should not be summed across semesters.' }],{tableTitle:'Programme financial summary',variant:'analytics'});
-    if (section === 'Admissions & Students') return page('ENROLMENT OVERSIGHT','Admissions & Students','Track applications, offers, enrolment and student activity by programme.',activeCandidates,[metric('Applications',state.candidates.length,'Current demo intake'),metric('Published',state.candidates.filter(c => ['Published','Enrolled'].includes(c.status)).length,'Approved candidates'),metric('Enrolled',enrolledCount,'Assigned cohort')],[{ title: 'Admissions funnel', detail: 'Candidate stages remain visible from submission through enrolment.' },{ title: 'Student continuation', detail: 'Returning students may join a later semester while retaining previous enrolment history.' }],{tableTitle:'Admissions overview',variant:'analytics'});
-    if (section === 'Programmes') return page('ACADEMIC PORTFOLIO','Programme Portfolio','Executive view of programme levels, active courses and delivery status.',programmeRows,[metric('Programmes',3,'Certificate, diploma, degree'),metric('Active',2,'Current prototype setup'),metric('Courses',18,'Across three pathways')],fullProgrammeCards,{tableTitle:'Programme summary',variant:'library'});
-    if (section === 'Certificates') return page('ACADEMIC COMPLETION','Certificates','Review candidate readiness, verification and certificate status.',certificateRows,[metric('Readiness reviews',2,'Sample candidates'),metric('Ready for verification',1,'Completion check'),metric('Outstanding requirement',1,'Final assessment')],[{ title: 'Completion verification', detail: 'Programme requirements, released marks and student identity are checked before issue.' },{ title: 'Issuance control', detail: 'Certificate approval and numbering require the official backend workflow.' }],{tableTitle:'Certificate register'});
-    if (section === 'Management Reviews') return page('LEADERSHIP REVIEW','Management Reviews','Follow programme performance, finance and admissions items raised for executive discussion.',[row(['Review','Semester performance meeting'],['Area','Academics'],['Owner','Head of Programs'],['Due','Dec 2026'],['Status','Scheduled']),row(['Review','Fee collection review'],['Area','Finance'],['Owner','Finance'],['Due','Nov 2026'],['Status','In progress']),row(['Review','Admissions cycle close'],['Area','Secretariat'],['Owner','Secretariat'],['Due','Dec 2026'],['Status','Planned'])],[metric('Review topics',3,'Across departments'),metric('Current period','2026 S2','Academic cycle'),metric('Decisions due',1,'Sample meeting')],[{ title: 'Programme quality', detail: 'Academic performance and completion outcomes.' },{ title: 'Institutional position', detail: 'Admissions and finance updates for leadership.' }],{tableTitle:'Review agenda'});
-    if (section === 'Reports') return page('EXECUTIVE REPORTING','Director Reports','Institution-wide academic, admissions and finance views.',reportRows,[metric('Report families',4,'Cross-functional views'),metric('Programmes',3,'Current sample'),metric('Period','2026 S2','Illustrative')],[{ title: 'Academic reports', detail: 'Performance, progression and completion.' },{ title: 'Finance reports', detail: 'Collections and outstanding closing balances.' }],{tableTitle:'Available executive reports',variant:'analytics'});
+    if (section === 'Approvals')
+      return page(
+        'EXECUTIVE DECISIONS',
+        'Approval Queue',
+        'Review forwarded requisitions and administrative records requiring a final decision.',
+        state.requisitions.map((r) =>
+          row(
+            ['Reference', r.id],
+            ['Item', r.title],
+            ['Owner', r.requester],
+            ['Value', `MWK ${r.amount.toLocaleString('en-GB')}`],
+            ['Status', r.status],
+          ),
+        ),
+        [
+          metric(
+            'Forwarded',
+            state.requisitions.filter((r) => r.status === 'Forwarded').length,
+            'Awaiting Director',
+          ),
+          metric(
+            'Approved',
+            state.requisitions.filter((r) => r.status === 'Approved').length,
+            'Ready for Finance',
+          ),
+          metric('Records for review', 1, 'Administrative route'),
+        ],
+        [
+          {
+            title: 'Decision trail',
+            detail: 'Forwarded requests receive a final approval or are returned with reasons.',
+          },
+          {
+            title: 'Finance handoff',
+            detail: 'Approved requisitions move to Finance for payment initiation.',
+          },
+        ],
+        { tableTitle: 'Executive decision register' },
+      );
+    if (section === 'Academic Performance')
+      return page(
+        'ACADEMIC OVERSIGHT',
+        'Academic Performance',
+        'Compare programme activity, student volume and pass rates across academic periods.',
+        [
+          row(
+            ['Programme', 'Certificate in Ministry'],
+            ['Students', '28'],
+            ['Pass rate', '86%'],
+            ['Courses', '4'],
+            ['Period', '2026 · Semester 2'],
+            ['Status', 'Active'],
+          ),
+          row(
+            ['Programme', 'Diploma in Theology'],
+            ['Students', '36'],
+            ['Pass rate', '78%'],
+            ['Courses', '6'],
+            ['Period', '2026 · Semester 2'],
+            ['Status', 'Active'],
+          ),
+          row(
+            ['Programme', 'Bachelor of Ministry'],
+            ['Students', '18'],
+            ['Pass rate', '81%'],
+            ['Courses', '8'],
+            ['Period', '2026 · Semester 2'],
+            ['Status', 'Active'],
+          ),
+        ],
+        [
+          metric('Current active students', 82, 'Illustrative 2026 S2 period'),
+          metric('Weighted pass rate', '81%', 'Programme sample'),
+          metric('Programmes', 3, 'Academic pathways'),
+        ],
+        [
+          {
+            title: 'Performance trends',
+            detail:
+              'Compare the latest period with previous semesters before making programme decisions.',
+          },
+          {
+            title: 'Completion readiness',
+            detail: 'Student completion requires verified academic records.',
+          },
+        ],
+        { tableTitle: 'Programme performance', variant: 'analytics' },
+      );
+    if (section === 'Finance Summary')
+      return page(
+        'EXECUTIVE FINANCE',
+        'Finance Summary',
+        'Review collected amounts and outstanding balances by programme and academic period.',
+        [
+          row(
+            ['Programme', 'Certificate in Ministry'],
+            ['Collected', 'MWK 1,260,000'],
+            ['Outstanding', 'MWK 420,000'],
+            ['Period', '2026 · Semester 2'],
+            ['Status', 'Current'],
+          ),
+          row(
+            ['Programme', 'Diploma in Theology'],
+            ['Collected', 'MWK 2,520,000'],
+            ['Outstanding', 'MWK 630,000'],
+            ['Period', '2026 · Semester 2'],
+            ['Status', 'Current'],
+          ),
+          row(
+            ['Programme', 'Bachelor of Ministry'],
+            ['Collected', 'MWK 2,040,000'],
+            ['Outstanding', 'MWK 510,000'],
+            ['Period', '2026 · Semester 2'],
+            ['Status', 'Current'],
+          ),
+        ],
+        [
+          metric('Collected', 'MWK 5.82m', 'Illustrative period total'),
+          metric('Outstanding', 'MWK 1.56m', 'Closing balances'),
+          metric(
+            'Confirmed this session',
+            `MWK ${collected.toLocaleString('en-GB')}`,
+            'Demo payment flow',
+          ),
+        ],
+        [
+          {
+            title: 'Collection coverage',
+            detail: 'Collections are activity totals for the selected period.',
+          },
+          {
+            title: 'Closing balances',
+            detail:
+              'Outstanding amounts represent closing positions and should not be summed across semesters.',
+          },
+        ],
+        { tableTitle: 'Programme financial summary', variant: 'analytics' },
+      );
+    if (section === 'Admissions & Students')
+      return page(
+        'ENROLMENT OVERSIGHT',
+        'Admissions & Students',
+        'Track applications, offers, enrolment and student activity by programme.',
+        activeCandidates,
+        [
+          metric('Applications', state.candidates.length, 'Current demo intake'),
+          metric(
+            'Published',
+            state.candidates.filter((c) => ['Published', 'Enrolled'].includes(c.status)).length,
+            'Approved candidates',
+          ),
+          metric('Enrolled', enrolledCount, 'Assigned cohort'),
+        ],
+        [
+          {
+            title: 'Admissions funnel',
+            detail: 'Candidate stages remain visible from submission through enrolment.',
+          },
+          {
+            title: 'Student continuation',
+            detail:
+              'Returning students may join a later semester while retaining previous enrolment history.',
+          },
+        ],
+        { tableTitle: 'Admissions overview', variant: 'analytics' },
+      );
+    if (section === 'Programmes')
+      return page(
+        'ACADEMIC PORTFOLIO',
+        'Programme Portfolio',
+        'Executive view of programme levels, active courses and delivery status.',
+        programmeRows,
+        [
+          metric('Programmes', 3, 'Certificate, diploma, degree'),
+          metric('Active', 2, 'Current prototype setup'),
+          metric('Courses', 18, 'Across three pathways'),
+        ],
+        fullProgrammeCards,
+        { tableTitle: 'Programme summary', variant: 'library' },
+      );
+    if (section === 'Certificates')
+      return page(
+        'ACADEMIC COMPLETION',
+        'Certificates',
+        'Review candidate readiness, verification and certificate status.',
+        certificateRows,
+        [
+          metric('Readiness reviews', 2, 'Sample candidates'),
+          metric('Ready for verification', 1, 'Completion check'),
+          metric('Outstanding requirement', 1, 'Final assessment'),
+        ],
+        [
+          {
+            title: 'Completion verification',
+            detail:
+              'Programme requirements, released marks and student identity are checked before issue.',
+          },
+          {
+            title: 'Issuance control',
+            detail: 'Certificate approval and numbering require the official backend workflow.',
+          },
+        ],
+        { tableTitle: 'Certificate register' },
+      );
+    if (section === 'Management Reviews')
+      return page(
+        'LEADERSHIP REVIEW',
+        'Management Reviews',
+        'Follow programme performance, finance and admissions items raised for executive discussion.',
+        [
+          row(
+            ['Review', 'Semester performance meeting'],
+            ['Area', 'Academics'],
+            ['Owner', 'Head of Programs'],
+            ['Due', 'Dec 2026'],
+            ['Status', 'Scheduled'],
+          ),
+          row(
+            ['Review', 'Fee collection review'],
+            ['Area', 'Finance'],
+            ['Owner', 'Finance'],
+            ['Due', 'Nov 2026'],
+            ['Status', 'In progress'],
+          ),
+          row(
+            ['Review', 'Admissions cycle close'],
+            ['Area', 'Secretariat'],
+            ['Owner', 'Secretariat'],
+            ['Due', 'Dec 2026'],
+            ['Status', 'Planned'],
+          ),
+        ],
+        [
+          metric('Review topics', 3, 'Across departments'),
+          metric('Current period', '2026 S2', 'Academic cycle'),
+          metric('Decisions due', 1, 'Sample meeting'),
+        ],
+        [
+          { title: 'Programme quality', detail: 'Academic performance and completion outcomes.' },
+          {
+            title: 'Institutional position',
+            detail: 'Admissions and finance updates for leadership.',
+          },
+        ],
+        { tableTitle: 'Review agenda' },
+      );
+    if (section === 'Reports')
+      return page(
+        'EXECUTIVE REPORTING',
+        'Director Reports',
+        'Institution-wide academic, admissions and finance views.',
+        reportRows,
+        [
+          metric('Report families', 4, 'Cross-functional views'),
+          metric('Programmes', 3, 'Current sample'),
+          metric('Period', '2026 S2', 'Illustrative'),
+        ],
+        [
+          { title: 'Academic reports', detail: 'Performance, progression and completion.' },
+          { title: 'Finance reports', detail: 'Collections and outstanding closing balances.' },
+        ],
+        { tableTitle: 'Available executive reports', variant: 'analytics' },
+      );
   }
   if (role === 'media') {
-    if (section === 'Media Library' || section === 'Course Materials') return page('LEARNING MEDIA',section === 'Media Library' ? 'Media Library' : 'Course Materials','Organise course videos, audio, documents and links with an explicit audience and publication state.',resourceRows,[metric('Resources',resourceRows.length,'Prototype and session entries'),metric('Available',resourceRows.filter(r => ['Available','Published'].includes(r.Status)).length,'Accessible to course audience'),metric('Draft or processing',resourceRows.filter(r => ['Draft','Processing'].includes(r.Status)).length,'Pending preparation')],[{ title: 'Publication scope', detail: 'Only published resources should reach enrolled students.' },{ title: 'Course ownership', detail: 'Each media item belongs to a course and carries a type, file detail and access scope.' }],{tableTitle:'Resource register',variant:'library'});
+    if (section === 'Media Library' || section === 'Course Materials')
+      return page(
+        'LEARNING MEDIA',
+        section === 'Media Library' ? 'Media Library' : 'Course Materials',
+        'Organise course videos, audio, documents and links with an explicit audience and publication state.',
+        resourceRows,
+        [
+          metric('Resources', resourceRows.length, 'Prototype and session entries'),
+          metric(
+            'Available',
+            resourceRows.filter((r) => ['Available', 'Published'].includes(r.Status)).length,
+            'Accessible to course audience',
+          ),
+          metric(
+            'Draft or processing',
+            resourceRows.filter((r) => ['Draft', 'Processing'].includes(r.Status)).length,
+            'Pending preparation',
+          ),
+        ],
+        [
+          {
+            title: 'Publication scope',
+            detail: 'Only published resources should reach enrolled students.',
+          },
+          {
+            title: 'Course ownership',
+            detail:
+              'Each media item belongs to a course and carries a type, file detail and access scope.',
+          },
+        ],
+        { tableTitle: 'Resource register', variant: 'library' },
+      );
   }
   if (role === 'system-admin') {
-    if (section === 'Users') return page('ACCOUNT MANAGEMENT','User Accounts','Inspect sample accounts, role assignments, lockouts and MFA state.',userRows,[metric('User accounts',userRows.length,'Sample directory'),metric('Active',userRows.filter(r => r.Status === 'Active').length,'Enabled accounts'),metric('Locked',1,'Requires identity verification')],[{ title: 'Account lifecycle', detail: 'Create, activate, lock or recover accounts after identity verification.' },{ title: 'Role assignment', detail: 'Roles determine portal entry; the backend must enforce each permission.' }],{tableTitle:'Account directory',variant:'directory'});
-    if (section === 'Staff Management') return page('STAFF DIRECTORY','Staff Management','Institutional staff and account links for authorised platform administration.',staff,[metric('Staff profiles',staff.length,'Sample directory'),metric('Departments',4,'Institutional units'),metric('Active staff',staff.filter(r => r.Status === 'Active').length,'Current')],[{ title: 'Directory link', detail: 'Staff profiles and account permissions are related but separate records.' },{ title: 'Department scope', detail: 'Designation and department inform the role assignment process.' }],{tableTitle:'Staff directory',variant:'directory'});
-    if (section === 'Roles & Permissions') return page('ACCESS CONTROL','Roles & Permissions','Review the permission boundary for each portal role before backend enforcement.',capabilities,[metric('Portal roles',capabilities.length,'Defined in prototype'),metric('Sensitive domains',5,'Academic, finance, identity, records, media'),metric('Access model','RBAC','Server enforcement needed')],[{ title: 'Least privilege', detail: 'A role grants only the data and actions necessary for its institutional responsibility.' },{ title: 'Server enforcement', detail: 'Navigation visibility is presentation only; each API operation must verify permission and record scope.' }],{tableTitle:'Role capability matrix',variant:'settings'});
-    if (section === 'Programmes') return page('ACADEMIC CONFIGURATION','Programme Definitions','Define programme codes, levels and duration for the academic catalogue.',programmeRows,[metric('Defined programmes',3,'Current prototype'),metric('Active',2,'Ready for offerings'),metric('Planned',1,'Future pathway')],fullProgrammeCards,{tableTitle:'Programme definitions',variant:'library'});
-    if (section === 'Courses') return page('ACADEMIC CONFIGURATION','Course Definitions','Review course codes, programme linkage and active offerings.',academicRows,[metric('Course definitions',academicRows.length,'Current demo catalogue'),metric('Programmes',2,'With course examples'),metric('Lecturer assignments',2,'Current faculty')],academicCards,{tableTitle:'Course definitions',variant:'library'});
-    if (section === 'Academic Setup') return page('ACADEMIC CONFIGURATION','Academic Setup','Manage academic years, semesters and scheduling boundaries.',academicSetup,[metric('Academic periods',2,'Current and draft'),metric('Active','2026 S2','Current sample'),metric('Next','2027 S1','Draft period')],[{ title: 'Period boundaries', detail: 'Start and end dates scope enrolment, teaching, assessment and reporting.' },{ title: 'Timezone', detail: 'Schedules use Africa/Blantyre for institutional decisions.' }],{tableTitle:'Academic periods',variant:'settings'});
-    if (section === 'Security & Sessions') return page('SECURITY','Security & Sessions','Review sample account sessions and sign-in alerts.',sessionRows,[metric('Active sessions',2,'Sample devices'),metric('Alerts',1,'Lockout review'),metric('Session policy','30 min','Proposed inactivity duration')],[{ title: 'Account lockout', detail: 'Repeated sign-in failures require identity verification before access changes.' },{ title: 'Session controls', detail: 'Operational sessions need secure cookies, expiry and revocation in the backend.' }],{tableTitle:'Sessions and alerts',variant:'settings'});
-    if (section === 'Audit Trail') return page('AUDIT','Audit Trail','Trace sample account events, resources and outcomes.',auditRows,[metric('Audit events',auditRows.length,'Sample trail'),metric('Review needed',1,'Account lockout'),metric('Recorded',1,'Administrator sign-in')],[{ title: 'Event provenance', detail: 'Actor, timestamp, resource and outcome are preserved for review.' },{ title: 'Operational logging', detail: 'The backend should append immutable events for sensitive changes.' }],{tableTitle:'Recent audit events',variant:'settings'});
-    if (section === 'Integrations') return page('SERVICE CONNECTIONS','Integrations','Track connection requirements for institutional email, live classes and payments.',integrationRows,[metric('Services',integrationRows.length,'Planned connections'),metric('Connected',0,'Current prototype'),metric('Planned',1,'Live class provider')],[{ title: 'Institutional email', detail: 'Verified sender and approved provider needed before delivery.' },{ title: 'Payment gateway', detail: 'Settlement, reconciliation and secure server credentials need Finance approval.' }],{tableTitle:'Integration register',variant:'settings'});
-    if (section === 'Backups') return page('RECOVERY','Backups','Review backup scope, verification and proposed retention.',backupRows,[metric('Backup scopes',2,'Database and media'),metric('Verified sample',1,'Database check'),metric('Review needed',1,'Media manifest')],[{ title: 'Recovery rehearsal', detail: 'Restores should be tested in a designated environment with approval.' },{ title: 'Retention', detail: 'The sample proposes 30 days; final policy belongs to institution operations.' }],{tableTitle:'Backup and recovery register',variant:'settings'});
-    if (section === 'System Settings') return page('PLATFORM CONFIGURATION','System Settings','Institutional identity, timezone, academic period and proposed limits.',settingsRows,[metric('Institution','HOSOM','Hope School of Ministry'),metric('Timezone','CAT','Africa/Blantyre'),metric('Academic year','2026','Current sample')],[{ title: 'Institution identity', detail: 'Branding and contact details appear consistently across portals and reports.' },{ title: 'Operational controls', detail: 'Session duration, upload limits and maintenance notices need backend configuration.' }],{tableTitle:'Configuration values',variant:'settings'});
-    if (section === 'System Reports') return page('PLATFORM INSIGHTS','System Reports','Sample account, security, configuration and integration reports.',[...reportRows.slice(0,2),...integrationRows.slice(0,1)],[metric('User accounts',userRows.length,'Sample directory'),metric('Audit events',auditRows.length,'Sample trail'),metric('Integrations',integrationRows.length,'Connection register')],[{ title: 'Account report', detail: 'Role distribution, active accounts and lockouts.' },{ title: 'Security report', detail: 'Sessions, alerts and audit events.' }],{tableTitle:'System reporting views',variant:'analytics'});
+    if (section === 'Users')
+      return page(
+        'ACCOUNT MANAGEMENT',
+        'User Accounts',
+        'Inspect sample accounts, role assignments, lockouts and MFA state.',
+        userRows,
+        [
+          metric('User accounts', userRows.length, 'Sample directory'),
+          metric(
+            'Active',
+            userRows.filter((r) => r.Status === 'Active').length,
+            'Enabled accounts',
+          ),
+          metric('Locked', 1, 'Requires identity verification'),
+        ],
+        [
+          {
+            title: 'Account lifecycle',
+            detail: 'Create, activate, lock or recover accounts after identity verification.',
+          },
+          {
+            title: 'Role assignment',
+            detail: 'Roles determine portal entry; the backend must enforce each permission.',
+          },
+        ],
+        { tableTitle: 'Account directory', variant: 'directory' },
+      );
+    if (section === 'Staff Management')
+      return page(
+        'STAFF DIRECTORY',
+        'Staff Management',
+        'Institutional staff and account links for authorised platform administration.',
+        staff,
+        [
+          metric('Staff profiles', staff.length, 'Sample directory'),
+          metric('Departments', 4, 'Institutional units'),
+          metric('Active staff', staff.filter((r) => r.Status === 'Active').length, 'Current'),
+        ],
+        [
+          {
+            title: 'Directory link',
+            detail: 'Staff profiles and account permissions are related but separate records.',
+          },
+          {
+            title: 'Department scope',
+            detail: 'Designation and department inform the role assignment process.',
+          },
+        ],
+        { tableTitle: 'Staff directory', variant: 'directory' },
+      );
+    if (section === 'Roles & Permissions')
+      return page(
+        'ACCESS CONTROL',
+        'Roles & Permissions',
+        'Review the permission boundary for each portal role before backend enforcement.',
+        capabilities,
+        [
+          metric('Portal roles', capabilities.length, 'Defined in prototype'),
+          metric('Sensitive domains', 5, 'Academic, finance, identity, records, media'),
+          metric('Access model', 'RBAC', 'Server enforcement needed'),
+        ],
+        [
+          {
+            title: 'Least privilege',
+            detail:
+              'A role grants only the data and actions necessary for its institutional responsibility.',
+          },
+          {
+            title: 'Server enforcement',
+            detail:
+              'Navigation visibility is presentation only; each API operation must verify permission and record scope.',
+          },
+        ],
+        { tableTitle: 'Role capability matrix', variant: 'settings' },
+      );
+    if (section === 'Programmes')
+      return page(
+        'ACADEMIC CONFIGURATION',
+        'Programme Definitions',
+        'Define programme codes, levels and duration for the academic catalogue.',
+        programmeRows,
+        [
+          metric('Defined programmes', 3, 'Current prototype'),
+          metric('Active', 2, 'Ready for offerings'),
+          metric('Planned', 1, 'Future pathway'),
+        ],
+        fullProgrammeCards,
+        { tableTitle: 'Programme definitions', variant: 'library' },
+      );
+    if (section === 'Courses')
+      return page(
+        'ACADEMIC CONFIGURATION',
+        'Course Definitions',
+        'Review course codes, programme linkage and active offerings.',
+        academicRows,
+        [
+          metric('Course definitions', academicRows.length, 'Current demo catalogue'),
+          metric('Programmes', 2, 'With course examples'),
+          metric('Lecturer assignments', 2, 'Current faculty'),
+        ],
+        academicCards,
+        { tableTitle: 'Course definitions', variant: 'library' },
+      );
+    if (section === 'Academic Setup')
+      return page(
+        'ACADEMIC CONFIGURATION',
+        'Academic Setup',
+        'Manage academic years, semesters and scheduling boundaries.',
+        academicSetup,
+        [
+          metric('Academic periods', 2, 'Current and draft'),
+          metric('Active', '2026 S2', 'Current sample'),
+          metric('Next', '2027 S1', 'Draft period'),
+        ],
+        [
+          {
+            title: 'Period boundaries',
+            detail: 'Start and end dates scope enrolment, teaching, assessment and reporting.',
+          },
+          {
+            title: 'Timezone',
+            detail: 'Schedules use Africa/Blantyre for institutional decisions.',
+          },
+        ],
+        { tableTitle: 'Academic periods', variant: 'settings' },
+      );
+    if (section === 'Security & Sessions')
+      return page(
+        'SECURITY',
+        'Security & Sessions',
+        'Review sample account sessions and sign-in alerts.',
+        sessionRows,
+        [
+          metric('Active sessions', 2, 'Sample devices'),
+          metric('Alerts', 1, 'Lockout review'),
+          metric('Session policy', '30 min', 'Proposed inactivity duration'),
+        ],
+        [
+          {
+            title: 'Account lockout',
+            detail:
+              'Repeated sign-in failures require identity verification before access changes.',
+          },
+          {
+            title: 'Session controls',
+            detail:
+              'Operational sessions need secure cookies, expiry and revocation in the backend.',
+          },
+        ],
+        { tableTitle: 'Sessions and alerts', variant: 'settings' },
+      );
+    if (section === 'Audit Trail')
+      return page(
+        'AUDIT',
+        'Audit Trail',
+        'Trace sample account events, resources and outcomes.',
+        auditRows,
+        [
+          metric('Audit events', auditRows.length, 'Sample trail'),
+          metric('Review needed', 1, 'Account lockout'),
+          metric('Recorded', 1, 'Administrator sign-in'),
+        ],
+        [
+          {
+            title: 'Event provenance',
+            detail: 'Actor, timestamp, resource and outcome are preserved for review.',
+          },
+          {
+            title: 'Operational logging',
+            detail: 'The backend should append immutable events for sensitive changes.',
+          },
+        ],
+        { tableTitle: 'Recent audit events', variant: 'settings' },
+      );
+    if (section === 'Integrations')
+      return page(
+        'SERVICE CONNECTIONS',
+        'Integrations',
+        'Track connection requirements for institutional email, live classes and payments.',
+        integrationRows,
+        [
+          metric('Services', integrationRows.length, 'Planned connections'),
+          metric('Connected', 0, 'Current prototype'),
+          metric('Planned', 1, 'Live class provider'),
+        ],
+        [
+          {
+            title: 'Institutional email',
+            detail: 'Verified sender and approved provider needed before delivery.',
+          },
+          {
+            title: 'Payment gateway',
+            detail:
+              'Settlement, reconciliation and secure server credentials need Finance approval.',
+          },
+        ],
+        { tableTitle: 'Integration register', variant: 'settings' },
+      );
+    if (section === 'Backups')
+      return page(
+        'RECOVERY',
+        'Backups',
+        'Review backup scope, verification and proposed retention.',
+        backupRows,
+        [
+          metric('Backup scopes', 2, 'Database and media'),
+          metric('Verified sample', 1, 'Database check'),
+          metric('Review needed', 1, 'Media manifest'),
+        ],
+        [
+          {
+            title: 'Recovery rehearsal',
+            detail: 'Restores should be tested in a designated environment with approval.',
+          },
+          {
+            title: 'Retention',
+            detail: 'The sample proposes 30 days; final policy belongs to institution operations.',
+          },
+        ],
+        { tableTitle: 'Backup and recovery register', variant: 'settings' },
+      );
+    if (section === 'System Settings')
+      return page(
+        'PLATFORM CONFIGURATION',
+        'System Settings',
+        'Institutional identity, timezone, academic period and proposed limits.',
+        settingsRows,
+        [
+          metric('Institution', 'HOSOM', 'Hope School of Ministry'),
+          metric('Timezone', 'CAT', 'Africa/Blantyre'),
+          metric('Academic year', '2026', 'Current sample'),
+        ],
+        [
+          {
+            title: 'Institution identity',
+            detail: 'Branding and contact details appear consistently across portals and reports.',
+          },
+          {
+            title: 'Operational controls',
+            detail:
+              'Session duration, upload limits and maintenance notices need backend configuration.',
+          },
+        ],
+        { tableTitle: 'Configuration values', variant: 'settings' },
+      );
+    if (section === 'System Reports')
+      return page(
+        'PLATFORM INSIGHTS',
+        'System Reports',
+        'Sample account, security, configuration and integration reports.',
+        [...reportRows.slice(0, 2), ...integrationRows.slice(0, 1)],
+        [
+          metric('User accounts', userRows.length, 'Sample directory'),
+          metric('Audit events', auditRows.length, 'Sample trail'),
+          metric('Integrations', integrationRows.length, 'Connection register'),
+        ],
+        [
+          { title: 'Account report', detail: 'Role distribution, active accounts and lockouts.' },
+          { title: 'Security report', detail: 'Sessions, alerts and audit events.' },
+        ],
+        { tableTitle: 'System reporting views', variant: 'analytics' },
+      );
   }
-  if (section === 'Events' || section === 'Operations') return page('INSTITUTIONAL CALENDAR',section,'Plan events, announcements and responsibilities across the school.',operationalEvents,[metric('Events',operationalEvents.length,'Sample calendar'),metric('Scheduled',1,'Upcoming meeting'),metric('Audience groups',3,'Staff, students, all staff')],[{ title: 'Event planning', detail: 'Date, owner, audience and status remain visible across departments.' },{ title: 'Announcements', detail: 'Published notices should reach only the chosen recipients.' }],{tableTitle:'Event calendar'});
-  if (section === 'Mailer') return page('INTERNAL COMMUNICATION','Mailer','Review the institutional directory and sample communication channels.',[row(['Contact','Secretariat'],['Department','Student administration'],['Address','secretariat@example.org'],['Status','Directory']),row(['Contact','Academic office'],['Department','Academics'],['Address','academics@example.org'],['Status','Directory']),row(['Contact','Finance'],['Department','Finance'],['Address','finance@example.org'],['Status','Directory'])],[metric('Directory groups',3,'Sample contacts'),metric('Sent',0,'No email service connected'),metric('Drafts',0,'No persistent mailbox')],[{ title: 'Institutional directory', detail: 'Select recipients from a verified organisation directory.' },{ title: 'Attachments & delivery', detail: 'SMTP, delivery history and file scanning require the separate backend.' }],{tableTitle:'Directory contacts'});
-  return page('HOSOM WORKSPACE',section,`A role-specific ${section.toLowerCase()} view for ${roles[role].label}.`,[],[],[],{note:demoNote});
+  if (section === 'Events' || section === 'Operations')
+    return page(
+      'INSTITUTIONAL CALENDAR',
+      section,
+      'Plan events, announcements and responsibilities across the school.',
+      operationalEvents,
+      [
+        metric('Events', operationalEvents.length, 'Sample calendar'),
+        metric('Scheduled', 1, 'Upcoming meeting'),
+        metric('Audience groups', 3, 'Staff, students, all staff'),
+      ],
+      [
+        {
+          title: 'Event planning',
+          detail: 'Date, owner, audience and status remain visible across departments.',
+        },
+        {
+          title: 'Announcements',
+          detail: 'Published notices should reach only the chosen recipients.',
+        },
+      ],
+      { tableTitle: 'Event calendar' },
+    );
+  if (section === 'Mailer')
+    return page(
+      'INTERNAL COMMUNICATION',
+      'Mailer',
+      'Review the institutional directory and sample communication channels.',
+      [
+        row(
+          ['Contact', 'Secretariat'],
+          ['Department', 'Student administration'],
+          ['Address', 'secretariat@example.org'],
+          ['Status', 'Directory'],
+        ),
+        row(
+          ['Contact', 'Academic office'],
+          ['Department', 'Academics'],
+          ['Address', 'academics@example.org'],
+          ['Status', 'Directory'],
+        ),
+        row(
+          ['Contact', 'Finance'],
+          ['Department', 'Finance'],
+          ['Address', 'finance@example.org'],
+          ['Status', 'Directory'],
+        ),
+      ],
+      [
+        metric('Directory groups', 3, 'Sample contacts'),
+        metric('Sent', 0, 'No email service connected'),
+        metric('Drafts', 0, 'No persistent mailbox'),
+      ],
+      [
+        {
+          title: 'Institutional directory',
+          detail: 'Select recipients from a verified organisation directory.',
+        },
+        {
+          title: 'Attachments & delivery',
+          detail: 'SMTP, delivery history and file scanning require the separate backend.',
+        },
+      ],
+      { tableTitle: 'Directory contacts' },
+    );
+  return page(
+    'HOSOM WORKSPACE',
+    section,
+    `A role-specific ${section.toLowerCase()} view for ${roles[role].label}.`,
+    [],
+    [],
+    [],
+    { note: demoNote },
+  );
 }

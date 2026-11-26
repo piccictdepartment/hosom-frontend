@@ -1,0 +1,537 @@
+.student-assessments {
+  display: grid;
+  gap: 24px;
+  color: #334155;
+}
+
+.student-assessments-page-title {
+  margin: 5px 0 -6px;
+  color: #17365b;
+  font: 500 27px var(--font-display);
+}
+
+.student-assessments-intro {
+  padding: 20px;
+  margin-bottom: 12px;
+  border: 1px solid #c7ddee;
+  border-radius: 10px;
+  background: linear-gradient(115deg, #eff6ff, #fff);
+}
+
+.student-assessments-intro>span {
+  color: #6b89a3;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.student-assessments-intro h2 {
+  margin: 6px 0 5px;
+  color: #1e3a8a;
+  font-size: 21px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.student-assessments-intro p {
+  margin: 0;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.student-assessments-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.student-assessments-stats>div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 64px;
+  padding: 14px 17px;
+  border: 1px solid #e2e8f0;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.student-assessments-stats span {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.student-assessments-stats strong {
+  color: #1e3a8a;
+  font-size: 23px;
+  font-weight: 650;
+}
+
+.student-assessments-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 26px;
+}
+
+.student-assessments-toolbar>span {
+  color: #64748b;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.student-assessments-tabs {
+  display: flex;
+  gap: 5px;
+  width: max-content;
+  max-width: 100%;
+  padding: 5px;
+  border-radius: 9px;
+  background: #eaf0f8;
+}
+
+.student-assessments-tabs button {
+  min-height: 33px;
+  padding: 7px 12px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #526174;
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.student-assessments-tabs button.active {
+  background: #e8f0f8;
+  color: #2c618a;
+  font-weight: 700;
+}
+
+.student-assessments-tabs button:focus-visible, .student-assessment-action:focus-visible, .student-assessment-back:focus-visible {
+  outline: 3px solid #8eb9dc;
+  outline-offset: 2px;
+}
+
+.student-assessments-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.student-assessment-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 190px;
+  padding: 16px 18px;
+  border: 1px solid #e1e8ef;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 2px 5px #18395403;
+}
+
+.student-assessment-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.student-assessment-type, .student-assessment-detail-badge {
+  display: inline-block;
+  padding: 4px 9px;
+  border: 1px solid #dde6ee;
+  border-radius: 5px;
+  background: #f1f5f9;
+  color: #526174;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.student-assessment-state {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.student-assessment-card h3 {
+  margin: 0 0 6px;
+  color: #1e3a8a;
+  font-size: 15px;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+.student-assessment-card p {
+  margin: 0 0 7px;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.student-assessment-card .student-assessment-action {
+  margin-top: auto;
+}
+
+.student-assessment-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  width: 100%;
+  padding: 9px 15px;
+  border: 1px solid #245c88;
+  border-radius: 6px;
+  background: #245c88;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.student-assessment-action:hover {
+  background: #1b4c75;
+  border-color: #1b4c75;
+}
+
+.student-assessment-action:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.student-assessments-empty {
+  padding: 42px 24px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  background: #fff;
+  text-align: center;
+}
+
+.student-assessments-empty>div {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 16px;
+  border-radius: 12px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 27px;
+}
+
+.student-assessments-empty h2 {
+  margin: 0 0 10px;
+  color: #1e3a8a;
+  font-size: 19px;
+}
+
+.student-assessments-empty p {
+  max-width: 500px;
+  margin: auto;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.student-assessments-guidance {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.student-assessments-guidance>div {
+  display: flex;
+  gap: 12px;
+  padding: 17px;
+  border-radius: 10px;
+  background: #f1f5f9;
+}
+
+.student-assessments-guidance>div>span {
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.student-assessments-guidance strong {
+  color: #1e3a8a;
+  font-size: 12px;
+}
+
+.student-assessments-guidance p {
+  margin: 7px 0 0;
+  color: #64748b;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.student-assessment-dialog {
+  width: min(900px, 100%);
+  padding: 0;
+  overflow-y: auto;
+}
+
+.student-feature-backdrop:has(.student-assessment-dialog) {
+  padding: 42px 20px 42px 270px;
+}
+
+.student-feature-backdrop:has(.student-assessment-dialog) .student-assessment-dialog {
+  max-height: calc(100dvh - 84px);
+}
+
+.student-assessment-dialog-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 64px;
+  padding: 14px 24px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #fff;
+  color: #17365b;
+  font-size: 15px;
+}
+
+.student-assessment-dialog .student-feature-close {
+  position: static;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 7px;
+  background: #f1f5f9;
+  color: #315675;
+  font-size: 22px;
+}
+
+.student-assessment-dialog-content {
+  padding: 44px 24px 24px;
+}
+
+.student-assessment-back {
+  margin: 0 0 20px;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid #1d4ed8;
+  background: none;
+  color: #1d4ed8;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.student-assessment-dialog-content h2 {
+  margin: 14px 0 10px;
+  color: #1e3a8a;
+  font: 650 25px Arial, sans-serif;
+}
+
+.student-assessment-detail-course {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.student-assessment-instructions {
+  margin: 34px 0 24px;
+  padding: 38px 22px 54px;
+  border-radius: 12px;
+  background: #eff6ff;
+}
+
+.student-assessment-instructions h3 {
+  margin: 0 0 20px;
+  color: #1e3a8a;
+  font-size: 15px;
+}
+
+.student-assessment-instructions p {
+  margin: 0 0 45px;
+  color: #475569;
+  font-size: 14px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+.student-assessment-instructions dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin: 0;
+}
+
+.student-assessment-instructions dt {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.student-assessment-instructions dd {
+  margin: 6px 0 0;
+  color: #334155;
+  font-size: 12px;
+}
+
+.student-assessment-dialog .student-feature-attachment {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 24px;
+  border: 1px dashed #a9cbe7;
+  border-radius: 12px;
+  color: #1e3a8a;
+  font-size: 13px;
+}
+
+.student-assessment-dialog .student-feature-attachment input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  color: #475569;
+  font-size: 12px;
+}
+
+.student-assessment-dialog .student-feature-attachment small {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.student-assessment-dialog .student-feature-check {
+  gap: 10px;
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.student-assessment-dialog .student-feature-check input {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  accent-color: #2563eb;
+}
+
+.student-assessment-dialog .student-assessment-submit-form {
+  gap: 32px;
+}
+
+.student-assessment-dialog .student-assessment-submit-form>.student-assessment-action {
+  min-height: 50px;
+  margin-top: 4px;
+  border-color: #3182e4;
+  background: #3182e4;
+  font-size: 14px;
+}
+
+.student-assessment-dialog .student-assessment-submit-form>.student-assessment-action:hover {
+  background: #1d70d1;
+}
+
+.student-assessment-demo-note {
+  color: #71849a;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.student-assessment-feedback {
+  padding: 20px;
+  border-radius: 10px;
+  background: #eff6ff;
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.student-assessment-feedback h3 {
+  margin: 0;
+  color: #1e3a8a;
+}
+
+.student-assessment-feedback .student-assessment-action {
+  margin-top: 16px;
+}
+
+@media(max-width:800px) {
+  .student-assessments-list, .student-assessments-guidance {
+    grid-template-columns: 1fr;
+  }
+
+  .student-assessments-toolbar {
+    flex-wrap: wrap;
+  }
+}
+
+@media(max-width:950px) {
+  .student-feature-backdrop:has(.student-assessment-dialog) {
+    padding-left: 20px;
+  }
+}
+
+@media(max-width:600px) {
+  .student-assessments {
+    gap: 16px;
+  }
+
+  .student-assessments-intro {
+    margin-bottom: 0;
+  }
+
+  .student-assessments-stats {
+    grid-template-columns: 1fr;
+    gap: 9px;
+  }
+
+  .student-assessments-stats>div {
+    min-height: 54px;
+  }
+
+  .student-assessments-toolbar {
+    margin-top: 4px;
+  }
+
+  .student-assessments-tabs {
+    width: 100%;
+  }
+
+  .student-assessments-tabs button {
+    flex: 1;
+    padding: 7px 5px;
+  }
+
+  .student-assessments-toolbar>span {
+    width: 100%;
+    text-align: right;
+  }
+
+  .student-feature-backdrop:has(.student-assessment-dialog) {
+    padding: 10px;
+  }
+
+  .student-feature-backdrop:has(.student-assessment-dialog) .student-assessment-dialog {
+    max-height: calc(100dvh - 20px);
+  }
+
+  .student-assessment-dialog-header {
+    padding: 12px 16px;
+  }
+
+  .student-assessment-dialog-content {
+    padding: 20px 16px;
+  }
+
+  .student-assessment-instructions {
+    margin-top: 24px;
+    padding: 18px;
+  }
+
+  .student-assessment-instructions dl {
+    grid-template-columns: 1fr;
+  }
+}
