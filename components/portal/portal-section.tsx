@@ -12,6 +12,7 @@ import { LecturerAnnouncements, LecturerMessages } from '@/components/lecturer/l
 import { LearningContent } from '@/components/portal/learning-content';
 import { AccountContent } from '@/components/portal/account-content';
 import { ManagementContent } from '@/components/portal/management-content';
+import { SystemAdminUsers } from '@/components/portal/system-admin-users';
 import { WorkflowWorkspace } from '@/components/portal/workflow-workspace';
 import { StudentAssessments, StudentFinance, StudentResults } from '@/components/student/student-experience';
 import { supportsLearningContent } from '@/lib/learning-routing';
@@ -37,6 +38,7 @@ export function PortalSection({ role, section }: { role: RoleSlug; section: stri
   if (role === 'student' && section === 'Results') return <StudentResults />;
   if (supportsLearningContent(role, section)) return <LearningContent role={role} section={section} />;
   if (supportsAccountContent(role, section)) return <AccountContent role={role} section={section} />;
+  if (role === 'system-admin' && section === 'Users') return <SystemAdminUsers />;
   if (supportsManagementContent(role, section)) return <ManagementContent role={role} section={section} />;
   if (supportsWorkflow(role, section)) return <WorkflowWorkspace role={role} section={section} />;
   notFound();
